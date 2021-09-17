@@ -1,6 +1,6 @@
 package com.app.source.configuration.security.services;
 
-import com.app.source.entities.ApplicationUser;
+import com.app.source.entities.Account;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,29 +16,36 @@ public class UserDetailsImpl implements UserDetails {
 
     private Long id;
 
-    private String username;
-
     private String email;
+
+    private String username;
 
     @JsonIgnore
     private String password;
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailsImpl(Long id, String username, String email, String password,
+    public UserDetailsImpl(Long id, String email, String password,
                            Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
-        this.username = username;
         this.email = email;
+        this.username = email;
         this.password = password;
         this.authorities = authorities;
     }
 
-    public static UserDetailsImpl build(ApplicationUser user) {
-        List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(user.getRole().getName().name()));
+    public static UserDetailsImpl build(Account user) {
+        String role;
+        if (user.isAdmin()) {
+            role = "SYS_ADMIN";
+        } else if (user.getRepresentative() != null && user.getStudent() == null) {
+            role = "COMPANY_REPRESENTATIVE";
+        } else {
+            role = "STUDENT";
+        }
+        List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
         return new UserDetailsImpl(
                 user.getId(),
-                user.getUsername(),
                 user.getEmail(),
                 user.getPassword(),
                 authorities);

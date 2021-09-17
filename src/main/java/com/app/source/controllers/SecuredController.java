@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@PostAuthorize("hasAnyAuthority('STUDENT','SYS_ADMIN')")
+@PostAuthorize("hasAnyAuthority('STUDENT')")
 @SecurityRequirement(name = "bearerAuth")
 @RequestMapping("/api/secure")
 public class SecuredController {

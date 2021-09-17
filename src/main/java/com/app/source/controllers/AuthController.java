@@ -1,19 +1,27 @@
 package com.app.source.controllers;
 
 import com.app.source.configuration.security.services.UserDetailsImpl;
-import com.app.source.entities.ApplicationUser;
-import com.app.source.entities.Role;
-import com.app.source.enums.RoleEnum;
+import com.app.source.entities.Account;
+import com.app.source.entities.Company;
+import com.app.source.entities.Major;
+import com.app.source.entities.Representative;
+import com.app.source.entities.Student;
+import com.app.source.exceptions.CompanyNotExistedException;
 import com.app.source.exceptions.CrudException;
 import com.app.source.exceptions.EmailAlreadyExistedException;
+import com.app.source.exceptions.EmptyRoleException;
+import com.app.source.exceptions.MajorNotExistedException;
 import com.app.source.exceptions.UsernameAlreadyExistedException;
 import com.app.source.payload.request.LoginRequest;
 import com.app.source.payload.request.SignupRequest;
 import com.app.source.payload.response.DataResponse;
 import com.app.source.payload.response.JwtResponse;
 import com.app.source.payload.response.Response;
-import com.app.source.repositories.ApplicationUserRepository;
-import com.app.source.repositories.RoleRepository;
+import com.app.source.repositories.AccountRepository;
+import com.app.source.repositories.CompanyRepository;
+import com.app.source.repositories.MajorRepository;
+import com.app.source.repositories.RepresentativeRepository;
+import com.app.source.repositories.StudentRepository;
 import com.app.source.utils.JwtUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +41,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -42,29 +49,38 @@ import java.util.stream.Collectors;
 public class AuthController {
     private final AuthenticationManager authenticationManager;
 
-    private final ApplicationUserRepository userRepository;
+    private final AccountRepository accountRepository;
 
-    private final RoleRepository roleRepository;
+    private final CompanyRepository companyRepository;
+
+    private final MajorRepository majorRepository;
+
+    private final StudentRepository studentRepository;
+
+    private final RepresentativeRepository representativeRepository;
 
     private final PasswordEncoder encoder;
 
     private final JwtUtils jwtUtils;
 
-    public AuthController(AuthenticationManager authenticationManager, ApplicationUserRepository userRepository,
-                          RoleRepository roleRepository, PasswordEncoder encoder, JwtUtils jwtUtils) {
+
+    public AuthController(AuthenticationManager authenticationManager, AccountRepository accountRepository,
+                          CompanyRepository companyRepository, MajorRepository majorRepository, StudentRepository studentRepository, RepresentativeRepository representativeRepository, PasswordEncoder encoder, JwtUtils jwtUtils) {
         this.authenticationManager = authenticationManager;
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
+        this.accountRepository = accountRepository;
+        this.companyRepository = companyRepository;
+        this.majorRepository = majorRepository;
+        this.studentRepository = studentRepository;
+        this.representativeRepository = representativeRepository;
         this.encoder = encoder;
         this.jwtUtils = jwtUtils;
-
     }
 
     @PostMapping("/signin")
     public ResponseEntity<JwtResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
@@ -82,45 +98,56 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<DataResponse<ApplicationUser>> registerUser(@Valid @RequestBody SignupRequest signUpRequest) throws UsernameAlreadyExistedException, EmailAlreadyExistedException {
-        RuntimeException runtimeException = new RuntimeException("Error: Role is not found.");
-        if (Boolean.TRUE.equals(userRepository.existsByUsername(signUpRequest.getUsername()))) {
+    public ResponseEntity<DataResponse<Account>> registerUser(@Valid @RequestBody SignupRequest signUpRequest)
+            throws UsernameAlreadyExistedException, EmailAlreadyExistedException, EmptyRoleException, CompanyNotExistedException, MajorNotExistedException {
+        if (signUpRequest.getStudentCode() != null && Boolean.TRUE.equals(accountRepository.existsByStudent_StudentCode(signUpRequest.getStudentCode()))) {
             throw new UsernameAlreadyExistedException();
         }
 
-        if (Boolean.TRUE.equals(userRepository.existsByEmail(signUpRequest.getEmail()))) {
+        if (Boolean.TRUE.equals(accountRepository.existsByEmail(signUpRequest.getEmail()))) {
             throw new EmailAlreadyExistedException();
         }
 
         // Create new user's account
-        ApplicationUser user = new ApplicationUser(signUpRequest.getUsername(),
+        Account account = new Account(signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()),
-                signUpRequest.getEmail());
-
+                signUpRequest.getName(),
+                signUpRequest.getPhone());
+        account = accountRepository.save(account);
         String strRole = signUpRequest.getRole();
-        Role role;
         if (strRole == null) {
-            role = Optional.ofNullable(roleRepository.findByName(RoleEnum.STUDENT))
-                    .orElseThrow(() -> runtimeException);
+            throw new EmptyRoleException();
         } else {
             switch (strRole) {
                 case "SYS_ADMIN":
-                    role = Optional.ofNullable(roleRepository.findByName(RoleEnum.SYS_ADMIN))
-                            .orElseThrow(() -> runtimeException);
+                    account.setAdmin(true);
                     break;
                 case "COMPANY_REPRESENTATIVE":
-                    role = Optional.ofNullable(roleRepository.findByName(RoleEnum.COMPANY_REPRESENTATIVE))
-                            .orElseThrow(() -> runtimeException);
+                    if (!companyRepository.existsById(signUpRequest.getCompanyId())) {
+                        throw new CompanyNotExistedException();
+                    }
+                    Company company = companyRepository.getById(signUpRequest.getCompanyId());
+                    Representative representative = new Representative();
+                    representative.setCompany(company);
+                    representative.setAccount(account);
+                    representativeRepository.save(representative);
                     break;
                 default:
-                    role = Optional.ofNullable(roleRepository.findByName(RoleEnum.STUDENT))
-                            .orElseThrow(() -> runtimeException);
+                    if (!majorRepository.existsById(signUpRequest.getMajorId())) {
+                        throw new MajorNotExistedException();
+                    }
+                    Major major = majorRepository.getById(signUpRequest.getMajorId());
+                    Student student = new Student();
+                    student.setStudentCode(signUpRequest.getStudentCode());
+                    student.setMajor(major);
+                    student.setAccount(account);
+                    student.setAddress(signUpRequest.getAddress());
+                    studentRepository.save(student);
                     break;
             }
         }
-        user.setRole(role);
-        user = userRepository.save(user);
-        return ResponseEntity.ok(new DataResponse<>("OK", "User registered successfully!", user));
+        account = accountRepository.save(account);
+        return ResponseEntity.ok(new DataResponse<>("OK", "User registered successfully!", account));
     }
 
     @GetMapping("/error-example/{error}")

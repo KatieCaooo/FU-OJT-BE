@@ -3,7 +3,6 @@ package com.app.source.configuration.datasource;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.cfg.Environment;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 
@@ -22,13 +21,18 @@ public class DataSourceBaseConfig {
     private String basePackage;
     private String sourceUnit;
 
+    private static final String HBM2DDL_AUTO_ENV = "hibernate.hbm2ddl.auto";
+    private static final String DIALECT_ENV = "hibernate.dialect";
+    private static final String DRIVER_ENV = "hibernate.connection.driver_class";
+    private static final String SHOW_SQL_ENV = "hibernate.show_sql";
+
 
     private Map<String, String> getProperties() {
         final Map<String, String> properties = new HashMap<>();
-        properties.put(Environment.HBM2DDL_AUTO, getDllMethod());
-        properties.put(Environment.DIALECT, getDialect());
-        properties.put(Environment.DRIVER, getDriver());
-        properties.put(Environment.SHOW_SQL, getShowSql());
+        properties.put(HBM2DDL_AUTO_ENV, getDllMethod());
+        properties.put(DIALECT_ENV, getDialect());
+        properties.put(DRIVER_ENV, getDriver());
+        properties.put(SHOW_SQL_ENV, getShowSql());
         return properties;
     }
 
