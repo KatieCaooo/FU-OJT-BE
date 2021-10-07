@@ -1,6 +1,12 @@
 
 .idea/
 
-target/
+data/target/
+
+common/target/
+
+business-logic/target/
+
+application/target/
 
 ojt-management.iml

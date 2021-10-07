@@ -3,6 +3,6 @@ services:
   ojt-management-backend:
     image: thanhthu0321/ojt-manager-backend:latest
     build:
-      context: .
+      context: ./application
     ports:
       - 9004:9004
