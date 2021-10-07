@@ -1,4 +1,4 @@
-package ojt.management.enums;
+package ojt.management.common.enums;
 
 public enum RoleEnum {
     SYS_ADMIN("SYS_ADMIN"),

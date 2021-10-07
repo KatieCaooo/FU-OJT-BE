@@ -36,13 +36,13 @@ public class Job implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "name", length = 250, nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
     @Column(name = "description", length = 2000, nullable = false)
     private String description;
 
-    @Column(name = "title", length = 250, nullable = false)
+    @Column(name = "title", nullable = false)
     private String title;
 
     @CreatedDate

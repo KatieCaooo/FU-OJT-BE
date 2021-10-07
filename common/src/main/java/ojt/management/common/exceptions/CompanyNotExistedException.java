@@ -1,6 +1,5 @@
-package ojt.management.exceptions;
+package ojt.management.common.exceptions;
 
-import ojt.management.common.exceptions.CrudException;
 import org.springframework.http.HttpStatus;
 
 public class CompanyNotExistedException extends CrudException {

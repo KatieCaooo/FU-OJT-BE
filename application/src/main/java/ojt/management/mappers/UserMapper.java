@@ -1,7 +1,7 @@
 package ojt.management.mappers;
 
 import ojt.management.data.entities.Account;
-import ojt.management.payload.dto.UserDTO;
+import ojt.management.common.payload.dto.UserDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -10,6 +10,7 @@ import org.mapstruct.Named;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
     @Mapping(source = "account", target = "role", qualifiedByName = "role")
+    @Mapping(source = "student", target = "student")
     UserDTO userToUserDTO(Account account);
 
     Account userDTOToUser(UserDTO userDTO);

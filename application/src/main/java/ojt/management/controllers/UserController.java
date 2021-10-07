@@ -1,21 +1,20 @@
 package ojt.management.controllers;
 
-
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import ojt.management.business.services.AccountService;
+import ojt.management.common.exceptions.AccountIdNotExistedException;
+import ojt.management.common.payload.request.AccountUpdateRequest;
 import ojt.management.mappers.UserMapper;
-import ojt.management.payload.dto.UserDTO;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import ojt.management.common.payload.dto.UserDTO;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
+@PostAuthorize("hasAnyAuthority('SYS_ADMIN')")
 @RequestMapping("/users")
 @SecurityRequirement(name = "bearerAuth")
 public class UserController {
@@ -28,21 +27,27 @@ public class UserController {
         this.userMapper = userMapper;
     }
 
-    @GetMapping
-    public List<UserDTO> getAllUsers() {
-        return accountService.getAllUsers().stream().map(userMapper::userToUserDTO).collect(Collectors.toList());
-    }
-
     @GetMapping("/{id}")
-    public Optional<UserDTO> getUserById(@PathVariable Long id) {
-        return accountService.getUserById(id).map(userMapper::userToUserDTO);
+    public UserDTO getUserById(@PathVariable Long id) throws AccountIdNotExistedException {
+        return userMapper.userToUserDTO(accountService.getUserById(id));
     }
 
-    @GetMapping("/search")
+    @GetMapping()
     public List<UserDTO> searchUser(@RequestParam(value = "name", required = false) String name,
                                     @RequestParam(value = "email", required = false) String email,
                                     @RequestParam(value = "phone", required = false) String phone) {
         return accountService.searchUser(name, email, phone).stream().map(userMapper::userToUserDTO).collect(Collectors.toList());
+    }
 
+    @PutMapping("/{id}")
+    public UserDTO updateUser(@Valid @RequestBody AccountUpdateRequest accountUpdateRequest) throws AccountIdNotExistedException {
+        return userMapper.userToUserDTO(accountService.updateUser(accountUpdateRequest.getId(),
+                accountUpdateRequest.getPhone(), accountUpdateRequest.getAddress(), accountUpdateRequest.getPassword()));
+
+    }
+
+    @DeleteMapping("/{id}")
+    public boolean deleteUser(@PathVariable Long id) throws AccountIdNotExistedException {
+        return accountService.deleteUser(id);
     }
 }

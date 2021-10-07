@@ -10,3 +10,5 @@ business-logic/target/
 application/target/
 
 ojt-management.iml
+
+*.iml

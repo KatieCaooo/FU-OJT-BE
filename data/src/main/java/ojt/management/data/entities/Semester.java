@@ -37,7 +37,7 @@ public class Semester implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "name", length = 250, nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
     @Column(name = "start_date", nullable = false)
@@ -72,5 +72,11 @@ public class Semester implements Serializable {
     @OneToMany(mappedBy = "semester")
     private Set<Student> students;
     //----------[End]Mapping relationship----------
+
+    public Semester(String name, Date startDate, Date endDate) {
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
 
 }

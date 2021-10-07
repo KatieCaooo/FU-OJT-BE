@@ -38,9 +38,6 @@ public class Application implements Serializable {
     @Column(name = "experience", length = 1000)
     private String experience;
 
-    @OneToMany(mappedBy = "application")
-    private Set<Attachment> attachments;
-
     @Column(name = "is_company_accepted")
     private boolean isCompanyAccepted;
 
@@ -65,6 +62,8 @@ public class Application implements Serializable {
     private boolean disabled;
 
     //----------[Start]Mapping relationship----------
+    @OneToMany(mappedBy = "application")
+    private Set<Attachment> attachments;
 
     @OneToOne
     private Evaluation evaluation;

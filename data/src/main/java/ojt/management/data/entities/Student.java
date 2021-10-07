@@ -27,7 +27,7 @@ public class Student implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "address", length = 512)
+    @Column(name = "address", length = 500)
     private String address;
 
     @Column(name = "student_code", length = 10, nullable = false)

@@ -1,9 +1,9 @@
-package ojt.management.payload.dto;
+package ojt.management.common.payload.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ojt.management.enums.RoleEnum;
+import ojt.management.common.enums.RoleEnum;
 
 @Data
 @AllArgsConstructor
