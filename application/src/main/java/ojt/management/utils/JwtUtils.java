@@ -22,7 +22,7 @@ public class JwtUtils {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
     private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
-    private int jwtExpirationMs = SecurityConstants.JWT_EXPIRATION_MS;
+    private static final int jwtExpirationMs = SecurityConstants.JWT_EXPIRATION_MS;
 
     public String generateJwtToken(Authentication authentication) {
 

@@ -2,6 +2,8 @@ package ojt.management.business.services;
 
 import ojt.management.common.exceptions.SemesterAlreadyExistedException;
 import ojt.management.common.exceptions.SemesterNotExistedException;
+import ojt.management.common.payload.request.SemesterRequest;
+import ojt.management.common.payload.request.SemesterUpdateRequest;
 import ojt.management.data.entities.Semester;
 
 import java.util.Date;
@@ -12,9 +14,9 @@ public interface SemesterService {
 
     List<Semester> searchSemesters(String name, Date startDate, Date endDate);
 
-    Semester updateSemester(Long id, String name, Date startDate, Date endDate) throws SemesterAlreadyExistedException, SemesterNotExistedException;
+    Semester updateSemester(SemesterUpdateRequest semesterUpdateRequest) throws SemesterAlreadyExistedException, SemesterNotExistedException;
 
     boolean deleteSemester(Long id) throws SemesterNotExistedException;
 
-    Semester createSemester(String name, Date startDate, Date endDate) throws SemesterAlreadyExistedException;
+    Semester createSemester(SemesterRequest semesterRequest) throws SemesterAlreadyExistedException;
 }

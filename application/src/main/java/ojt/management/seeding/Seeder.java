@@ -1,5 +1,6 @@
 package ojt.management.seeding;
 
+import ojt.management.common.enums.RoleEnum;
 import ojt.management.controllers.AuthController;
 import ojt.management.data.entities.Company;
 import ojt.management.data.entities.Major;
@@ -65,13 +66,14 @@ public class Seeder {
     }
 
     private void seedAccount() {
+        String initialPassword = "123456";
         List<SignupRequest> signupRequests = Arrays.asList(
-                new SignupRequest("thanhthu0321@gmail.com", "123456", "Thu", "SYS_ADMIN", "0988988796"),
-                new SignupRequest("student1@gmail.com", "123456", "First Student", "STUDENT", "0123867861", "123 Street, Ward 11, A District, ABC city", "SE150099", Long.valueOf(1)),
-                new SignupRequest("student2@gmail.com", "123456", "Second Student", "STUDENT", "0123667861", "124 Street, Ward 11, A District, ABC city", "SE150098", Long.valueOf(1)),
-                new SignupRequest("student3@gmail.com", "123456", "Third Student", "STUDENT", "0123897861", "125 Street, Ward 11, A District, ABC city", "BA150097", Long.valueOf(2)),
-                new SignupRequest("representative1@gmail.com", "123456", "First Representative", "COMPANY_REPRESENTATIVE", "1237894560", Long.valueOf(1)),
-                new SignupRequest("representative2@gmail.com", "123456", "Second Representative", "COMPANY_REPRESENTATIVE", "1237894560", Long.valueOf(2)));
+                new SignupRequest("thanhthu0321@gmail.com", initialPassword, "Thu", RoleEnum.SYS_ADMIN.name(), "0988988796"),
+                new SignupRequest("student1@gmail.com", initialPassword, "First Student", RoleEnum.STUDENT.name(), "0123867861", "123 Street, Ward 11, A District, ABC city", "SE150099", Long.valueOf(1)),
+                new SignupRequest("student2@gmail.com", initialPassword, "Second Student", RoleEnum.STUDENT.name(), "0123667861", "124 Street, Ward 11, A District, ABC city", "SE150098", Long.valueOf(1)),
+                new SignupRequest("student3@gmail.com", initialPassword, "Third Student", RoleEnum.STUDENT.name(), "0123897861", "125 Street, Ward 11, A District, ABC city", "BA150097", Long.valueOf(2)),
+                new SignupRequest("representative1@gmail.com", initialPassword, "First Representative", RoleEnum.COMPANY_REPRESENTATIVE.name(), "1237894560", Long.valueOf(1)),
+                new SignupRequest("representative2@gmail.com", initialPassword, "Second Representative", RoleEnum.COMPANY_REPRESENTATIVE.name(), "1237894560", Long.valueOf(2)));
 
         signupRequests.stream().forEach(signupRequest -> {
             try {

@@ -1,19 +1,18 @@
 package ojt.management.common.payload.request;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ojt.management.data.entities.Major;
-import ojt.management.data.entities.Semester;
 
-import java.util.Set;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class JobCreateRequest {
-    private String name;
-    private String description;
-    private String title;
-    private String semesters;
-    private String majors;
+public class JobCreateRequest extends JobRequest implements Serializable {
+    @NotNull
+    @NotBlank
+    private Long companyId;
 }

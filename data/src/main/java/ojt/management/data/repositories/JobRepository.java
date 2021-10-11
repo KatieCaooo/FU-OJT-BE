@@ -1,24 +1,45 @@
 package ojt.management.data.repositories;
+
 import ojt.management.data.entities.Job;
-import ojt.management.data.entities.Major;
-import ojt.management.data.entities.Semester;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Set;
 
 @Repository
-public interface JobRepository extends JpaRepository<Job, Long>{
+public interface JobRepository extends JpaRepository<Job, Long> {
+    //Search all job (for students)
+    @Query("SELECT distinct j " +
+            "FROM Job j " +
+            "inner join j.semesters s " +
+            "inner join j.majors m " +
+            "WHERE j.name like :name " +
+            "AND j.title like :title " +
+            "AND (s.id = :semesterId or :semesterId is null) " +
+            "AND (m.id = :majorId or :majorId is null)")
+    List<Job> searchJob(@Param("name") String name, @Param("title") String title,
+                        @Param("semesterId") Long semesterId, @Param("majorId") Long majorId);
 
-    @Query("SELECT a FROM Job a where a.name = :name or a.description = :description or a.title = :title or a.semesters = :semesters or a.majors = :majors")
-    List<Job> searchJob(@Param("name") String name, @Param("description") String description, @Param("title") String title,
-                        @Param("semesters") String semesters, @Param("majors") String majors);
+    //Get job by ID for Rep
+    @Query("select DISTINCT j FROM Job j inner JOIN j.company c where c.id = :companyId and j.id = :id")
+    Job getJobByRep(@Param("companyId") Long companyId, @Param("id") Long id);
 
-    boolean existsByCompany(Long id);
-
-    boolean existsByName(String name);
-
+    //Search all job (for Rep)
+    @Query("SELECT distinct j " +
+            "FROM Job j " +
+            "inner join j.semesters s " +
+            "inner join j.majors m " +
+            "inner join j.company c " +
+            "WHERE j.name like :name " +
+            "AND j.title like :title " +
+            "AND (s.id = :semesterId or :semesterId is null) " +
+            "AND (m.id = :majorId or :majorId is null) " +
+            "AND c.id = :companyId")
+    List<Job> searchJobByRep(@Param("name") String name,
+                        @Param("title") String title,
+                        @Param("semesterId") Long semesterId,
+                        @Param("majorId") Long majorId,
+                        @Param("companyId") Long companyId);
 }

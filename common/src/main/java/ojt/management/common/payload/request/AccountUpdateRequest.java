@@ -4,28 +4,28 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AccountUpdateRequest {
+public class AccountUpdateRequest implements Serializable {
     @NotNull
+    @NotBlank
     private Long id;
 
     @NotNull
-    @Max(13)
-    @Min(10)
+    @Size(min = 10, max = 13)
     private String phone;
 
-    @Max(500)
+    @Size(max = 500)
     private String address;
 
     @NotNull
     @NotBlank
-    @Max(1024)
+    @Size(min = 8, max = 1024)
     private String password;
 }

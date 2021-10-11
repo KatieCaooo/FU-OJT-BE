@@ -6,7 +6,6 @@ import ojt.management.data.entities.Major;
 import ojt.management.data.repositories.MajorRepository;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @Service
@@ -29,7 +28,7 @@ public class MajorServiceImpl implements MajorService{
         if (name == null) {
             return majorRepository.findAll();
         }
-        return  majorRepository.searchMajor(name);
+        return  majorRepository.findByName(name);
     }
 
     @Override
@@ -40,7 +39,7 @@ public class MajorServiceImpl implements MajorService{
             throw new MajorNameAlreadyExistedException();
         } else {
             Major major = majorRepository.getById(id);
-            if (major.isDisabled() == true) {
+            if (major.isDisabled()) {
                 throw new MajorNotExistedException();
             } else {
                 if (name != null) {
@@ -58,14 +57,11 @@ public class MajorServiceImpl implements MajorService{
             throw new MajorNotExistedException();
         } else {
             Major major = majorRepository.getById(id);
-            boolean response = false;
-            if (major != null && major.isDisabled() == false) {
+            if (!major.isDisabled()) {
                 major.setDisabled(true);
                 majorRepository.save(major);
-                response = true;
-                return response;
-            } else
-                return response;
+            }
+            return true;
         }
     }
 

@@ -12,7 +12,11 @@ import java.util.List;
 public interface AccountRepository extends JpaRepository<Account, Long> {
     Account findByEmail(String email);
 
-    @Query("SELECT a FROM Account a where a.name = :name or a.email = :email or a.phone = :phone ")
+    @Query("SELECT a " +
+            "FROM Account a " +
+            "WHERE a.name like :name " +
+            "OR a.email = :email " +
+            "OR a.phone = :phone ")
     List<Account> searchUser(@Param("name") String name, @Param("email") String email, @Param("phone") String phone);
 
     Boolean existsByStudent_StudentCode(String studentCode);

@@ -4,18 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Max;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SemesterCreateRequest {
+public class SemesterRequest implements Serializable {
     @NotNull
     @NotBlank
-    @Max(255)
+    @Size(max = 255)
     private String name;
 
     @NotNull

@@ -15,7 +15,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Set;
@@ -57,5 +56,9 @@ public class Company implements Serializable {
     public Company(String name, String description) {
         this.name = name;
         this.description = description;
+    }
+
+    public Company(Long id){
+        this.id = id;
     }
 }

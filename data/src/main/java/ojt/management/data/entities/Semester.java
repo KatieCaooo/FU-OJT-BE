@@ -79,4 +79,7 @@ public class Semester implements Serializable {
         this.endDate = endDate;
     }
 
+    public Semester(Long id) {
+        this.id = id;
+    }
 }

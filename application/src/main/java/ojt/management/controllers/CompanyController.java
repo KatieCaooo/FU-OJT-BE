@@ -2,7 +2,6 @@ package ojt.management.controllers;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import ojt.management.business.services.CompanyService;
-import ojt.management.common.exceptions.CompanyNameAlreadyExistedException;
 import ojt.management.common.exceptions.CompanyNotExistedException;
 import ojt.management.common.payload.dto.CompanyDTO;
 import ojt.management.common.payload.request.CompanyUpdateRequest;
@@ -15,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/companys")
+@RequestMapping("/companies")
 @SecurityRequirement(name = "bearerAuth")
 public class CompanyController {
 
@@ -38,7 +37,7 @@ public class CompanyController {
 
     @PostAuthorize("hasAnyAuthority('COMPANY_REPRESENTATIVE')")
     @PutMapping("/{id}")
-    public CompanyDTO updateCompany(@RequestBody @Valid CompanyUpdateRequest companyUpdateRequest) throws CompanyNotExistedException, CompanyNameAlreadyExistedException {
-        return companyMapper.companyToCompanyDTO(companyService.updateCompany(companyUpdateRequest.getName(), companyUpdateRequest.getDescription()));
+    public CompanyDTO updateCompany(@RequestBody @Valid CompanyUpdateRequest companyUpdateRequest) throws CompanyNotExistedException {
+        return companyMapper.companyToCompanyDTO(companyService.updateCompany(companyUpdateRequest));
     }
 }

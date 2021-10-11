@@ -62,4 +62,8 @@ public class Major implements Serializable {
     public Major(String name) {
         this.name = name;
     }
+
+    public Major(Long id) {
+        this.id = id;
+    }
 }

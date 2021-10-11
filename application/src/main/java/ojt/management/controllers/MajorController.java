@@ -6,15 +6,11 @@ import ojt.management.common.exceptions.MajorNameAlreadyExistedException;
 import ojt.management.common.exceptions.MajorNotExistedException;
 import ojt.management.common.payload.dto.MajorDTO;
 import ojt.management.common.payload.request.MajorUpdateRequest;
-import ojt.management.data.repositories.MajorRepository;
 import ojt.management.mappers.MajorMapper;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
