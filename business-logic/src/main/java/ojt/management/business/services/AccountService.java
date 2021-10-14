@@ -3,13 +3,14 @@ package ojt.management.business.services;
 
 import ojt.management.common.exceptions.AccountIdNotExistedException;
 import ojt.management.data.entities.Account;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 public interface AccountService {
     Account getUserById(Long id) throws AccountIdNotExistedException;
 
-    List<Account> searchUser(String name, String email, String phone);
+    Page<Account> searchUser(Specification<Account> specification, Pageable pageable);
 
     Account updateUser(Long id, String phone, String address, String password) throws AccountIdNotExistedException;
 

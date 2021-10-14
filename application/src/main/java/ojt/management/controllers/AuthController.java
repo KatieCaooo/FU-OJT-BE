@@ -3,24 +3,29 @@ package ojt.management.controllers;
 
 import ojt.management.business.services.AccountService;
 import ojt.management.common.exceptions.AccountIdNotExistedException;
-import ojt.management.common.payload.dto.UserDTO;
-import ojt.management.configuration.security.services.UserDetailsImpl;
-import ojt.management.data.entities.Account;
-import ojt.management.data.entities.Company;
-import ojt.management.data.entities.Major;
-import ojt.management.data.entities.Representative;
-import ojt.management.data.entities.Student;
 import ojt.management.common.exceptions.CompanyNotExistedException;
 import ojt.management.common.exceptions.CrudException;
 import ojt.management.common.exceptions.EmailAlreadyExistedException;
 import ojt.management.common.exceptions.EmptyRoleException;
 import ojt.management.common.exceptions.MajorNotExistedException;
+import ojt.management.common.exceptions.TokenRefreshException;
 import ojt.management.common.exceptions.UsernameAlreadyExistedException;
-import ojt.management.common.payload.request.LoginRequest;
-import ojt.management.common.payload.request.SignupRequest;
 import ojt.management.common.payload.DataResponse;
 import ojt.management.common.payload.JwtResponse;
 import ojt.management.common.payload.Response;
+import ojt.management.common.payload.TokenRefreshResponse;
+import ojt.management.common.payload.dto.UserDTO;
+import ojt.management.common.payload.request.LoginRequest;
+import ojt.management.common.payload.request.SignupRequest;
+import ojt.management.common.payload.request.TokenRefreshRequest;
+import ojt.management.configuration.security.services.RefreshTokenService;
+import ojt.management.configuration.security.services.UserDetailsImpl;
+import ojt.management.data.entities.Account;
+import ojt.management.data.entities.Company;
+import ojt.management.data.entities.Major;
+import ojt.management.data.entities.RefreshToken;
+import ojt.management.data.entities.Representative;
+import ojt.management.data.entities.Student;
 import ojt.management.data.repositories.AccountRepository;
 import ojt.management.data.repositories.CompanyRepository;
 import ojt.management.data.repositories.MajorRepository;
@@ -72,6 +77,8 @@ public class AuthController {
 
     private final JwtUtils jwtUtils;
 
+    private final RefreshTokenService refreshTokenService;
+
 
     public AuthController(AuthenticationManager authenticationManager,
                           AccountRepository accountRepository,
@@ -81,7 +88,7 @@ public class AuthController {
                           RepresentativeRepository representativeRepository,
                           AccountService accountService,
                           UserMapper userMapper, PasswordEncoder encoder,
-                          JwtUtils jwtUtils) {
+                          JwtUtils jwtUtils, RefreshTokenService refreshTokenService) {
         this.authenticationManager = authenticationManager;
         this.accountRepository = accountRepository;
         this.companyRepository = companyRepository;
@@ -92,6 +99,7 @@ public class AuthController {
         this.userMapper = userMapper;
         this.encoder = encoder;
         this.jwtUtils = jwtUtils;
+        this.refreshTokenService = refreshTokenService;
     }
 
     @PostMapping("/signin")
@@ -108,11 +116,13 @@ public class AuthController {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+
         Account account = accountService.getUserById(userDetails.getId());
         UserDTO userInfo = userMapper.userToUserDTO(account);
 
         return ResponseEntity.ok(new JwtResponse(jwt,
-                userDetails.getId(),
+                refreshToken.getToken(), userDetails.getId(),
                 userDetails.getUsername(),
                 userDetails.getEmail(),
                 roles, userInfo));
@@ -175,6 +185,21 @@ public class AuthController {
         }
         account = accountRepository.save(account);
         return ResponseEntity.ok(new DataResponse<>("OK", "User registered successfully!", account));
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refreshToken(@Valid @RequestBody TokenRefreshRequest request) {
+        String requestRefreshToken = request.getRefreshToken();
+
+        return refreshTokenService.findByToken(requestRefreshToken)
+                .map(refreshTokenService::verifyExpiration)
+                .map(RefreshToken::getAccount)
+                .map(account -> {
+                    String token = jwtUtils.generateTokenFromUsername(account.getEmail());
+                    return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
+                })
+                .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
+                        "Refresh token is not in database!"));
     }
 
     @GetMapping("/error-example/{error}")

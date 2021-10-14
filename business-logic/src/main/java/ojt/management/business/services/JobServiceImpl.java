@@ -1,9 +1,6 @@
 package ojt.management.business.services;
 
-import ojt.management.common.exceptions.CrudException;
-import ojt.management.common.exceptions.JobNotExistedException;
-import ojt.management.common.exceptions.MajorNotExistedException;
-import ojt.management.common.exceptions.SemesterNotExistedException;
+import ojt.management.common.exceptions.*;
 import ojt.management.common.payload.request.JobCreateRequest;
 import ojt.management.common.payload.request.JobRequest;
 import ojt.management.common.payload.request.JobUpdateRequest;
@@ -80,26 +77,25 @@ public class JobServiceImpl implements JobService {
         //Check authen: the Rep only can edit their own job
         Account account = accountRepository.getById(accountId);
         Long oldJob = jobRepository.getById(jobUpdateRequest.getId()).getCompany().getId();
-
-        if (account.isAdmin() || (account.getRepresentative().getCompany().getId() == oldJob)) {
-
-            validateSemesterIdsAndMajorIds(jobUpdateRequest);
-
-            Job job = jobRepository.getById(jobUpdateRequest.getId());
-            job.setName(jobUpdateRequest.getName());
-            job.setDescription(jobUpdateRequest.getDescription());
-            job.setTitle(jobUpdateRequest.getTitle());
-            List<Long> newSemesterIds = jobUpdateRequest.getSemesterIds().stream()
-                    .filter(id -> !job.getSemesters().stream()
-                            .map(Semester::getId).collect(Collectors.toList()).contains(id)).collect(Collectors.toList());
-            job.getSemesters().addAll(newSemesterIds.stream().map(Semester::new).collect(Collectors.toList()));
-            List<Long> newMajorIds = jobUpdateRequest.getMajorIds().stream()
-                    .filter(id -> !job.getMajors().stream()
-                            .map(Major::getId).collect(Collectors.toList()).contains(id)).collect(Collectors.toList());
-            job.getMajors().addAll(newMajorIds.stream().map(Major::new).collect(Collectors.toList()));
-            return jobRepository.save(job);
+        if (!account.isAdmin() || (!oldJob.equals(account.getRepresentative().getCompany().getId()))) {
+            throw new JobNotAllowedUpdateException();
         }
-        return null;
+
+        validateSemesterIdsAndMajorIds(jobUpdateRequest);
+
+        Job job = jobRepository.getById(jobUpdateRequest.getId());
+        job.setName(jobUpdateRequest.getName());
+        job.setDescription(jobUpdateRequest.getDescription());
+        job.setTitle(jobUpdateRequest.getTitle());
+        List<Long> newSemesterIds = jobUpdateRequest.getSemesterIds().stream()
+                .filter(id -> !job.getSemesters().stream()
+                        .map(Semester::getId).collect(Collectors.toList()).contains(id)).collect(Collectors.toList());
+        job.getSemesters().addAll(newSemesterIds.stream().map(Semester::new).collect(Collectors.toList()));
+        List<Long> newMajorIds = jobUpdateRequest.getMajorIds().stream()
+                .filter(id -> !job.getMajors().stream()
+                        .map(Major::getId).collect(Collectors.toList()).contains(id)).collect(Collectors.toList());
+        job.getMajors().addAll(newMajorIds.stream().map(Major::new).collect(Collectors.toList()));
+        return jobRepository.save(job);
     }
 
 
