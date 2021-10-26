@@ -18,4 +18,5 @@ public class JobDTO {
     private String title;
     private Set<Semester> semesters;
     private Set<Major> major;
+    private CompanyDTO companyDTO;
 }
