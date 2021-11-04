@@ -26,7 +26,7 @@ public class GenericRsqlSpecBuilder<T> {
         
         List<Specification<T>> specs = logicalNode.getChildren()
                 .stream()
-                .map(node -> createSpecification(node))
+                .map(this::createSpecification)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         

@@ -12,7 +12,7 @@ import java.util.List;
 @Component
 public class CORSFilter implements Filter {
 
-    private final List<String> allowedOrigins = Arrays.asList("http://localhost:3000", "*");
+    private final List<String> allowedOrigins = Arrays.asList("http://localhost:3000", "https://ojt-management.web.app", "*");
 
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws IOException, ServletException {
