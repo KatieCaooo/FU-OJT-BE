@@ -27,7 +27,9 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
             SemesterAlreadyExistedException.class,
             SemesterNotExistedException.class,
             ApplicationNotExistedException.class,
-            EvaluationIdNotExistedException.class})
+            EvaluationIdNotExistedException.class,
+            AttachmentAlreadyExistedException.class,
+            AttachmentNotExistedException.class})
      protected ResponseEntity<Response> handleAuthExceptions(CrudException exception) {
         return ResponseEntity
                 .status(exception.getStatus())

@@ -51,7 +51,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         if (Boolean.FALSE.equals(applicationRepository.existsById(id))) {
             throw new ApplicationNotExistedException();
         }
-        if (Boolean.FALSE.equals(accountRepository.existsById(id))) {
+        if (Boolean.FALSE.equals(accountRepository.existsById(accountId))) {
             throw new AccountIdNotExistedException();
         }
         Account account = accountRepository.getById(accountId);
