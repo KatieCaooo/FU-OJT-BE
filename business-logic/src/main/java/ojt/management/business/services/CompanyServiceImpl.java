@@ -50,7 +50,7 @@ public class CompanyServiceImpl implements CompanyService {
     public Company getCompanyById(Long id, Long accountId) throws CrudException {
         Account account = accountRepository.getById(accountId);
         if (account.getRepresentative() != null) { //The Rep only get their company
-            Long repCompanyId = representativeRepository.getById(accountId).getCompany().getId();
+            Long repCompanyId = accountRepository.getById(accountId).getRepresentative().getCompany().getId();
             if (!id.equals(repCompanyId)) {
                 throw new CompanyNotExistedException();
             }
