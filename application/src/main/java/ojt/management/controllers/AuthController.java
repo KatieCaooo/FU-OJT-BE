@@ -2,35 +2,19 @@ package ojt.management.controllers;
 
 
 import ojt.management.business.services.AccountService;
-import ojt.management.common.exceptions.AccountIdNotExistedException;
-import ojt.management.common.exceptions.CompanyNotExistedException;
-import ojt.management.common.exceptions.CrudException;
-import ojt.management.common.exceptions.EmailAlreadyExistedException;
-import ojt.management.common.exceptions.EmptyRoleException;
-import ojt.management.common.exceptions.MajorNotExistedException;
-import ojt.management.common.exceptions.TokenRefreshException;
-import ojt.management.common.exceptions.UsernameAlreadyExistedException;
+import ojt.management.common.exceptions.*;
 import ojt.management.common.payload.DataResponse;
 import ojt.management.common.payload.JwtResponse;
 import ojt.management.common.payload.Response;
 import ojt.management.common.payload.TokenRefreshResponse;
 import ojt.management.common.payload.dto.UserDTO;
 import ojt.management.common.payload.request.LoginRequest;
-import ojt.management.common.payload.request.SignupRequest;
+import ojt.management.common.payload.request.AccountRequest;
 import ojt.management.common.payload.request.TokenRefreshRequest;
 import ojt.management.configuration.security.services.RefreshTokenService;
 import ojt.management.configuration.security.services.UserDetailsImpl;
-import ojt.management.data.entities.Account;
-import ojt.management.data.entities.Company;
-import ojt.management.data.entities.Major;
-import ojt.management.data.entities.RefreshToken;
-import ojt.management.data.entities.Representative;
-import ojt.management.data.entities.Student;
-import ojt.management.data.repositories.AccountRepository;
-import ojt.management.data.repositories.CompanyRepository;
-import ojt.management.data.repositories.MajorRepository;
-import ojt.management.data.repositories.RepresentativeRepository;
-import ojt.management.data.repositories.StudentRepository;
+import ojt.management.data.entities.*;
+import ojt.management.data.repositories.*;
 import ojt.management.mappers.UserMapper;
 import ojt.management.utils.JwtUtils;
 import org.springframework.http.HttpStatus;
@@ -67,6 +51,8 @@ public class AuthController {
 
     private final StudentRepository studentRepository;
 
+    private final SemesterRepository semesterRepository;
+
     private final RepresentativeRepository representativeRepository;
 
     private final AccountService accountService;
@@ -85,6 +71,7 @@ public class AuthController {
                           CompanyRepository companyRepository,
                           MajorRepository majorRepository,
                           StudentRepository studentRepository,
+                          SemesterRepository semesterRepository,
                           RepresentativeRepository representativeRepository,
                           AccountService accountService,
                           UserMapper userMapper, PasswordEncoder encoder,
@@ -94,6 +81,7 @@ public class AuthController {
         this.companyRepository = companyRepository;
         this.majorRepository = majorRepository;
         this.studentRepository = studentRepository;
+        this.semesterRepository = semesterRepository;
         this.representativeRepository = representativeRepository;
         this.accountService = accountService;
         this.userMapper = userMapper;
@@ -129,12 +117,12 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<DataResponse<Account>> registerUser(@Valid @RequestBody SignupRequest signUpRequest)
+    public ResponseEntity<DataResponse<Account>> registerUser(@Valid @RequestBody AccountRequest signUpRequest)
             throws UsernameAlreadyExistedException,
             EmailAlreadyExistedException,
             EmptyRoleException,
-            CompanyNotExistedException,
-            MajorNotExistedException {
+            MajorNotExistedException,
+            SemesterNotExistedException {
         if (signUpRequest.getStudentCode() != null && Boolean.TRUE.equals(
                 accountRepository.existsByStudent_StudentCode(signUpRequest.getStudentCode()))) {
             throw new UsernameAlreadyExistedException();
@@ -148,7 +136,9 @@ public class AuthController {
         Account account = new Account(signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()),
                 signUpRequest.getName(),
-                signUpRequest.getPhone());
+                signUpRequest.getPhone(),
+                signUpRequest.getAvatar()
+        );
         account = accountRepository.save(account);
         String strRole = signUpRequest.getRole();
 
@@ -160,10 +150,11 @@ public class AuthController {
                     account.setAdmin(true);
                     break;
                 case "COMPANY_REPRESENTATIVE":
-                    if (!companyRepository.existsById(signUpRequest.getCompanyId())) {
-                        throw new CompanyNotExistedException();
-                    }
-                    Company company = companyRepository.getById(signUpRequest.getCompanyId());
+                    Company company = new Company();
+                    company.setName(signUpRequest.getCompanyName());
+                    company.setDescription(signUpRequest.getDescription());
+                    company.setAddress(signUpRequest.getCompanyAddress());
+                    companyRepository.save(company);
                     Representative representative = new Representative();
                     representative.setCompany(company);
                     representative.setAccount(account);
@@ -174,9 +165,14 @@ public class AuthController {
                         throw new MajorNotExistedException();
                     }
                     Major major = majorRepository.getById(signUpRequest.getMajorId());
+                    if (!semesterRepository.existsById(signUpRequest.getSemesterId())) {
+                        throw new SemesterNotExistedException();
+                    }
+                    Semester semester = semesterRepository.getById(signUpRequest.getSemesterId());
                     Student student = new Student();
                     student.setStudentCode(signUpRequest.getStudentCode());
                     student.setMajor(major);
+                    student.setSemester(semester);
                     student.setAccount(account);
                     student.setAddress(signUpRequest.getAddress());
                     studentRepository.save(student);

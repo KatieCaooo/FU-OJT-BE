@@ -2,16 +2,16 @@ package ojt.management.business.services;
 
 import ojt.management.common.exceptions.CompanyNotExistedException;
 import ojt.management.common.exceptions.CrudException;
-import ojt.management.common.payload.request.CompanyCreateRequest;
-import ojt.management.common.payload.request.CompanyUpdateRequest;
+import ojt.management.common.payload.request.CompanyRequest;
 import ojt.management.data.entities.Account;
 import ojt.management.data.entities.Company;
 import ojt.management.data.repositories.AccountRepository;
 import ojt.management.data.repositories.CompanyRepository;
 import ojt.management.data.repositories.RepresentativeRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class CompanyServiceImpl implements CompanyService {
@@ -29,22 +29,19 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public List<Company> searchCompany(String name, String description) {
-        if (name == null && description == null) {
-            return companyRepository.findAll();
-        } else {
-            return companyRepository.searchCompany(name, description);
-        }
+    public Page<Company> searchCompany(Specification<Company> specification, Pageable pageable) {
+        return companyRepository.findAll(specification, pageable);
     }
 
     @Override
-    public Company updateCompany(CompanyUpdateRequest companyUpdateRequest) throws CrudException {
-        if (!companyRepository.existsById(companyUpdateRequest.getId())) {
+    public Company updateCompany(Long id, CompanyRequest companyRequest, Long accountId) throws CrudException {
+        if (!companyRepository.existsById(id)) {
             throw new CompanyNotExistedException();
         }
-        Company company = companyRepository.getById(companyUpdateRequest.getId());
-        company.setName(companyUpdateRequest.getName());
-        company.setDescription(companyUpdateRequest.getDescription());
+        Company company = companyRepository.getById(id);
+        company.setName(companyRequest.getName());
+        company.setDescription(companyRequest.getDescription());
+        company.setAddress(companyRequest.getAddress());
 
         return companyRepository.save(company);
     }
@@ -63,13 +60,5 @@ public class CompanyServiceImpl implements CompanyService {
             }
         }
         return companyRepository.getById(id);
-    }
-
-    @Override
-    public Company createCompany(CompanyCreateRequest companyCreateRequest) {
-        Company company = new Company();
-        company.setName(companyCreateRequest.getName());
-        company.setDescription(companyCreateRequest.getDescription());
-        return companyRepository.save(company);
     }
 }

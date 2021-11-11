@@ -1,28 +1,23 @@
 package ojt.management.configuration.security.services;
 
-import java.time.Instant;
-import java.util.Optional;
-import java.util.UUID;
-
 import ojt.management.common.exceptions.TokenRefreshException;
 import ojt.management.data.entities.RefreshToken;
 import ojt.management.data.repositories.AccountRepository;
 import ojt.management.data.repositories.RefreshTokenRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
+import java.util.Optional;
+import java.util.UUID;
 
 import static ojt.management.constants.SecurityConstants.JWT_REFRESH_EXPIRATION_MS;
 
 
 @Service
 public class RefreshTokenService {
-    private int refreshTokenDurationMs = JWT_REFRESH_EXPIRATION_MS;
-
     private final RefreshTokenRepository refreshTokenRepository;
-
     private final AccountRepository accountRepository;
+    private final int refreshTokenDurationMs = JWT_REFRESH_EXPIRATION_MS;
 
     public RefreshTokenService(RefreshTokenRepository refreshTokenRepository, AccountRepository accountRepository) {
         this.refreshTokenRepository = refreshTokenRepository;

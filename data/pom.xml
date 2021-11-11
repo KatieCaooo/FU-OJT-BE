@@ -1,83 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<parent>
-		<artifactId>ojt.management</artifactId>
-		<groupId>ojt.management</groupId>
-		<version>1.0-SNAPSHOT</version>
-	</parent>
-	<modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>ojt.management</artifactId>
+        <groupId>ojt.management</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
 
-	<artifactId>data</artifactId>
-	<packaging>jar</packaging>
-	<dependencies>
-		<dependency>
-			<groupId>jakarta.validation</groupId>
-			<artifactId>jakarta.validation-api</artifactId>
-			<version>2.0.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-commons</artifactId>
-		</dependency>
+    <artifactId>data</artifactId>
+    <packaging>jar</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>2.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons</artifactId>
+        </dependency>
 
-<!--		<dependency>-->
-<!--			<groupId>com.querydsl</groupId>-->
-<!--			<artifactId>querydsl-core</artifactId>-->
-<!--			<version>${querydsl.version}</version>-->
-<!--		</dependency>-->
-<!--		<dependency>-->
-<!--			<groupId>com.querydsl</groupId>-->
-<!--			<artifactId>querydsl-apt</artifactId>-->
-<!--			<version>${querydsl.version}</version>-->
-<!--			<scope>provided</scope>-->
-<!--		</dependency>-->
-<!--		<dependency>-->
-<!--			<groupId>com.querydsl</groupId>-->
-<!--			<artifactId>querydsl-jpa</artifactId>-->
-<!--			<version>${querydsl.version}</version>-->
-<!--		</dependency>-->
+        <!--		<dependency>-->
+        <!--			<groupId>com.querydsl</groupId>-->
+        <!--			<artifactId>querydsl-core</artifactId>-->
+        <!--			<version>${querydsl.version}</version>-->
+        <!--		</dependency>-->
+        <!--		<dependency>-->
+        <!--			<groupId>com.querydsl</groupId>-->
+        <!--			<artifactId>querydsl-apt</artifactId>-->
+        <!--			<version>${querydsl.version}</version>-->
+        <!--			<scope>provided</scope>-->
+        <!--		</dependency>-->
+        <!--		<dependency>-->
+        <!--			<groupId>com.querydsl</groupId>-->
+        <!--			<artifactId>querydsl-jpa</artifactId>-->
+        <!--			<version>${querydsl.version}</version>-->
+        <!--		</dependency>-->
 
-		<dependency>
-			<groupId>cz.jirutka.rsql</groupId>
-			<artifactId>rsql-parser</artifactId>
-			<version>2.1.0</version>
-		</dependency>
+        <dependency>
+            <groupId>cz.jirutka.rsql</groupId>
+            <artifactId>rsql-parser</artifactId>
+            <version>2.1.0</version>
+        </dependency>
 
-	</dependencies>
+    </dependencies>
 
-	<properties>
-		<maven.compiler.source>8</maven.compiler.source>
-		<maven.compiler.target>8</maven.compiler.target>
-		<querydsl.version>4.1.3</querydsl.version>
-	</properties>
-<!--	<build>-->
-<!--		<plugins>-->
-<!--			<plugin>-->
-<!--				<groupId>com.mysema.maven</groupId>-->
-<!--				<artifactId>apt-maven-plugin</artifactId>-->
-<!--				<version>1.1.3</version>-->
-<!--				<executions>-->
-<!--					<execution>-->
-<!--						<phase>generate-sources</phase>-->
-<!--						<goals>-->
-<!--							<goal>process</goal>-->
-<!--						</goals>-->
-<!--						<configuration>-->
-<!--							<outputDirectory>${project.build.directory}/generated-sources</outputDirectory>-->
-<!--							<processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>-->
-<!--						</configuration>-->
-<!--					</execution>-->
-<!--				</executions>-->
-<!--			</plugin>-->
-<!--		</plugins>-->
-<!--	</build>-->
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <querydsl.version>4.1.3</querydsl.version>
+    </properties>
+    <!--	<build>-->
+    <!--		<plugins>-->
+    <!--			<plugin>-->
+    <!--				<groupId>com.mysema.maven</groupId>-->
+    <!--				<artifactId>apt-maven-plugin</artifactId>-->
+    <!--				<version>1.1.3</version>-->
+    <!--				<executions>-->
+    <!--					<execution>-->
+    <!--						<phase>generate-sources</phase>-->
+    <!--						<goals>-->
+    <!--							<goal>process</goal>-->
+    <!--						</goals>-->
+    <!--						<configuration>-->
+    <!--							<outputDirectory>${project.build.directory}/generated-sources</outputDirectory>-->
+    <!--							<processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>-->
+    <!--						</configuration>-->
+    <!--					</execution>-->
+    <!--				</executions>-->
+    <!--			</plugin>-->
+    <!--		</plugins>-->
+    <!--	</build>-->
 
 
 </project>

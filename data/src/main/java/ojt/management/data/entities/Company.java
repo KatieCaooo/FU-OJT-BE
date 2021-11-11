@@ -1,27 +1,22 @@
 package ojt.management.data.entities;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Set;
 
 @Entity
 @Table(name = "company")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
@@ -34,8 +29,11 @@ public class Company implements Serializable {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "description", length = 500, nullable = false)
+    @Column(name = "description", length = 2000, nullable = false)
     private String description;
+
+    @Column(name = "address", length = 500)
+    private String address;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false)
@@ -45,7 +43,7 @@ public class Company implements Serializable {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    @Column(name = "is_disabled")
+    @Column(name = "is_disabled", columnDefinition = "BOOLEAN DEFAULT false")
     private boolean disabled;
 
     //----------[Start]Mapping relationship----------
@@ -53,12 +51,13 @@ public class Company implements Serializable {
     private Set<Job> jobs;
     //----------[End]Mapping relationship----------
 
-    public Company(String name, String description) {
+    public Company(String name, String description, String address) {
         this.name = name;
         this.description = description;
+        this.address = address;
     }
 
-    public Company(Long id){
+    public Company(Long id) {
         this.id = id;
     }
 }

@@ -8,24 +8,20 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Date;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MajorUpdateRequest implements Serializable {
+public class ApplicationCreateRequest implements Serializable {
     @NotNull
     @NotBlank
-    private Long id;
+    @Size(max = 1000)
+    private String experience;
 
     @NotNull
-    @NotBlank
-    @Size(max = 250)
-    private String name;
+    private Long jobId;
 
     @NotNull
-    private Date startDate;
+    private Long accountId;
 
-    @NotNull
-    private Date endDate;
 }

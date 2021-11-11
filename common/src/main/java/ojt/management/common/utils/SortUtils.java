@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 public class SortUtils {
     public static Sort parseSortQuery(String query) {
-        if(Strings.isBlank(query)){
+        if (Strings.isBlank(query)) {
             return Sort.by("id").ascending();
         }
         Pattern pattern = Pattern.compile("(\\w.+?)( )(ASC|DESC|>|<|asc|desc),");

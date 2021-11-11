@@ -1,8 +1,9 @@
 package ojt.management.data.entities;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -20,7 +21,8 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "evaluation")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
@@ -45,7 +47,7 @@ public class Evaluation implements Serializable {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    @Column(name = "is_pass")
+    @Column(name = "is_pass", columnDefinition = "BOOLEAN DEFAULT false")
     private boolean isPass;
 
     //----------[Start]Mapping relationship----------

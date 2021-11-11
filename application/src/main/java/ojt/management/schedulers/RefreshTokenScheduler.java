@@ -4,6 +4,7 @@ import ojt.management.data.repositories.RefreshTokenRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
 import java.time.Instant;
 
 @Component
@@ -16,6 +17,7 @@ public class RefreshTokenScheduler {
     }
 
     @Scheduled(fixedRate = 1000 * 60 * 60)
+    @Transactional
     public void deleteExpiredRefreshToken() {
         refreshTokenRepository.deleteAllByExpiryDateBefore(Instant.now());
     }

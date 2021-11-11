@@ -1,6 +1,5 @@
 package ojt.management.configuration.security.jwt;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +10,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -25,7 +23,7 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
-                         AuthenticationException authException) throws IOException, ServletException {
+                         AuthenticationException authException) throws IOException {
         logger.error("Unauthorized error: {}", authException.getMessage());
         String errorMessage = (String) request.getAttribute("AuthenticationError");
         Gson gson = new Gson();
@@ -43,7 +41,7 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
 
     @Getter
     @Setter
-    public class AuthorizedErrorResponse implements Serializable {
+    public static class AuthorizedErrorResponse implements Serializable {
         private String timestamp;
         private int status;
         private String error;
@@ -58,5 +56,4 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
             this.path = path;
         }
     }
-
 }

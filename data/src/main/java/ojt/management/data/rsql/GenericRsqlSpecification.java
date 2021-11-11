@@ -20,15 +20,18 @@ import javax.persistence.metamodel.MapAttribute;
 import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class GenericRsqlSpecification<T> implements Specification<T> {
 
-    private String property;
-    private ComparisonOperator operator;
-    private List<String> arguments;
+    private final String property;
+    private final ComparisonOperator operator;
+    private final List<String> arguments;
 
     public GenericRsqlSpecification(final String property, final ComparisonOperator operator, final List<String> arguments) {
         super();
@@ -61,20 +64,40 @@ public class GenericRsqlSpecification<T> implements Specification<T> {
                 else return builder.notEqual(propertyExpression, argument);
 
             case GREATER_THAN:
-                return builder.greaterThan(propertyExpression,
-                        argument.toString());
+                if (argument instanceof String)
+                    return builder.greaterThan(propertyExpression,
+                            argument.toString());
+                else {
+                    return builder.greaterThan(propertyExpression,
+                            propertyExpression.getJavaType().cast(argument));
+                }
 
             case GREATER_THAN_OR_EQUAL:
-                return builder.greaterThanOrEqualTo(propertyExpression,
-                        argument.toString());
+                if (argument instanceof String)
+                    return builder.greaterThanOrEqualTo(propertyExpression,
+                            argument.toString());
+                else {
+                    return builder.greaterThanOrEqualTo(propertyExpression,
+                            propertyExpression.getJavaType().cast(argument));
+                }
 
             case LESS_THAN:
-                return builder.lessThan(propertyExpression,
-                        argument.toString());
+                if (argument instanceof String)
+                    return builder.lessThan(propertyExpression,
+                            argument.toString());
+                else {
+                    return builder.lessThan(propertyExpression,
+                            propertyExpression.getJavaType().cast(argument));
+                }
 
             case LESS_THAN_OR_EQUAL:
-                return builder.lessThanOrEqualTo(propertyExpression,
-                        argument.toString());
+                if (argument instanceof String)
+                    return builder.lessThanOrEqualTo(propertyExpression,
+                            argument.toString());
+                else {
+                    return builder.lessThanOrEqualTo(propertyExpression,
+                            propertyExpression.getJavaType().cast(argument));
+                }
             case IN:
                 return propertyExpression.in(args);
             case NOT_IN:
@@ -98,21 +121,21 @@ public class GenericRsqlSpecification<T> implements Specification<T> {
             From lastFrom = root;
 
             for (int i = 1; i <= pathSteps.length - 1; i++) {
-                if(path instanceof PluralAttributePath) {
+                if (path instanceof PluralAttributePath) {
                     PluralAttribute attr = ((PluralAttributePath) path).getAttribute();
                     Join join = getJoin(attr, lastFrom);
                     path = join.get(pathSteps[i]);
                     lastFrom = join;
-                } else if(path instanceof SingularAttributePath) {
+                } else if (path instanceof SingularAttributePath) {
                     SingularAttribute attr = ((SingularAttributePath) path).getAttribute();
-                    if(attr.getPersistentAttributeType() != Attribute.PersistentAttributeType.BASIC) {
+                    if (attr.getPersistentAttributeType() != Attribute.PersistentAttributeType.BASIC) {
                         Join join = lastFrom.join(attr, JoinType.LEFT);
                         path = join.get(pathSteps[i]);
                         lastFrom = join;
                     } else {
                         path = path.get(pathSteps[i]);
                     }
-                }  else {
+                } else {
                     path = path.get(pathSteps[i]);
                 }
             }
@@ -134,7 +157,7 @@ public class GenericRsqlSpecification<T> implements Specification<T> {
     }
 
     private Join createJoin(PluralAttribute attr, From from) {
-        switch (attr.getCollectionType()){
+        switch (attr.getCollectionType()) {
             case COLLECTION:
                 return from.join((CollectionAttribute) attr);
             case SET:
@@ -153,10 +176,13 @@ public class GenericRsqlSpecification<T> implements Specification<T> {
 
         return arguments.stream().map(arg -> {
             if (type.equals(Integer.class)) return Integer.parseInt(arg);
+            else if (type.equals(Boolean.class)) return Boolean.parseBoolean(arg);
+            else if (type.getName().equals("boolean")) return Boolean.parseBoolean(arg);
             else if (type.equals(Long.class)) return Long.parseLong(arg);
             else if (type.equals(Byte.class)) return Byte.parseByte(arg);
+            else if (type.equals(Date.class)) return Date.from(Instant.parse(arg));
+            else if (type.equals(Timestamp.class)) return Timestamp.from(Instant.parse((arg)));
             else return arg;
         }).collect(Collectors.toList());
     }
-
 }

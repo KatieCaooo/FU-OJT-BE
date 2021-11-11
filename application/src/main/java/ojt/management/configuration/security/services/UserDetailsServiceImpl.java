@@ -1,4 +1,5 @@
 package ojt.management.configuration.security.services;
+
 import ojt.management.data.entities.Account;
 import ojt.management.data.repositories.AccountRepository;
 import org.springframework.security.core.userdetails.UserDetails;

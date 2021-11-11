@@ -14,18 +14,16 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DataSourceBaseConfig {
+    private static final String HBM2DDL_AUTO_ENV = "hibernate.hbm2ddl.auto";
+    private static final String DIALECT_ENV = "hibernate.dialect";
+    private static final String DRIVER_ENV = "hibernate.connection.driver_class";
+    private static final String SHOW_SQL_ENV = "hibernate.show_sql";
     private String dialect;
     private String dllMethod;
     private String driver;
     private String showSql;
     private String basePackage;
     private String sourceUnit;
-
-    private static final String HBM2DDL_AUTO_ENV = "hibernate.hbm2ddl.auto";
-    private static final String DIALECT_ENV = "hibernate.dialect";
-    private static final String DRIVER_ENV = "hibernate.connection.driver_class";
-    private static final String SHOW_SQL_ENV = "hibernate.show_sql";
-
 
     private Map<String, String> getProperties() {
         final Map<String, String> properties = new HashMap<>();

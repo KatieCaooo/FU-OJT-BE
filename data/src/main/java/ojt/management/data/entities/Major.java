@@ -1,7 +1,8 @@
 package ojt.management.data.entities;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -20,11 +21,13 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "major")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class Major implements Serializable {
@@ -44,7 +47,7 @@ public class Major implements Serializable {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    @Column(name = "is_disabled")
+    @Column(name = "is_disabled", columnDefinition = "BOOLEAN DEFAULT false")
     private boolean disabled;
 
     //----------[Start]Mapping relationship----------
@@ -53,7 +56,7 @@ public class Major implements Serializable {
             name = "job_major",
             joinColumns = @JoinColumn(name = "major_id"),
             inverseJoinColumns = @JoinColumn(name = "job_id"))
-    private Set<Job> jobs;
+    private Set<Job> jobs = new HashSet<>();
 
     @OneToMany(mappedBy = "major")
     private Set<Student> students;
@@ -65,5 +68,10 @@ public class Major implements Serializable {
 
     public Major(Long id) {
         this.id = id;
+    }
+
+    public Major(Long id, Set<Job> jobs) {
+        this.id = id;
+        this.jobs = jobs;
     }
 }
