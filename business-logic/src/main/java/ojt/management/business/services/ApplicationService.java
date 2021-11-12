@@ -1,6 +1,6 @@
 package ojt.management.business.services;
 
-import ojt.management.common.exceptions.AccountIdNotExistedException;
+import ojt.management.common.exceptions.AccountNotExistedException;
 import ojt.management.common.exceptions.ApplicationNotExistedException;
 import ojt.management.common.exceptions.NotPermissionException;
 import ojt.management.common.payload.request.ApplicationCreateRequest;
@@ -12,7 +12,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 public interface ApplicationService {
 
-    Application getAppById(Long id, Long accountId) throws ApplicationNotExistedException, AccountIdNotExistedException;
+    Application getAppById(Long id, Long accountId) throws ApplicationNotExistedException, AccountNotExistedException, NotPermissionException;
 
     Page<Application> searchApplication(Specification<Application> specification, Pageable pageable);
 

@@ -4,7 +4,7 @@ import cz.jirutka.rsql.parser.RSQLParser;
 import cz.jirutka.rsql.parser.ast.Node;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import ojt.management.business.services.AccountService;
-import ojt.management.common.exceptions.AccountIdNotExistedException;
+import ojt.management.common.exceptions.AccountNotExistedException;
 import ojt.management.common.exceptions.NotPermissionException;
 import ojt.management.common.payload.PagedDataResponse;
 import ojt.management.common.payload.dto.UserDTO;
@@ -52,7 +52,7 @@ public class UserController {
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN')")
     @GetMapping("/{id}")
     public UserDTO getUserById(@PathVariable Long id)
-            throws AccountIdNotExistedException {
+            throws AccountNotExistedException {
         return userMapper.userToUserDTO(accountService.getUserById(id));
     }
 
@@ -83,7 +83,7 @@ public class UserController {
     public UserDTO updateUser(@PathVariable Long id,
                               @Valid @RequestBody AccountRequest accountUpdateRequest,
                               Authentication authentication)
-            throws AccountIdNotExistedException, NotPermissionException {
+            throws AccountNotExistedException, NotPermissionException {
         Long accountId = ((UserDetailsImpl) authentication.getPrincipal()).getId();
         return userMapper.userToUserDTO(accountService.updateUser(id, accountUpdateRequest, accountId));
     }
@@ -91,7 +91,7 @@ public class UserController {
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN')")
     @DeleteMapping("/{id}")
     public boolean deleteUser(@PathVariable Long id)
-            throws AccountIdNotExistedException {
+            throws AccountNotExistedException {
         return accountService.deleteUser(id);
     }
 }

@@ -1,6 +1,6 @@
 package ojt.management.business.services;
 
-import ojt.management.common.exceptions.AccountIdNotExistedException;
+import ojt.management.common.exceptions.AccountNotExistedException;
 import ojt.management.common.exceptions.EvaluationIdNotExistedException;
 import ojt.management.common.exceptions.NotPermissionException;
 import ojt.management.common.payload.request.EvaluationCreateRequest;
@@ -12,7 +12,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 public interface EvaluationService {
     Evaluation getEvaluationById(Long id, Long accountId)
-            throws EvaluationIdNotExistedException, AccountIdNotExistedException;
+            throws EvaluationIdNotExistedException, AccountNotExistedException, NotPermissionException;
 
     Page<Evaluation> searchEvaluation(Specification<Evaluation> specification, Pageable pageable);
 

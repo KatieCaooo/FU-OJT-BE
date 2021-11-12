@@ -1,6 +1,6 @@
 package ojt.management.business.services;
 
-import ojt.management.common.exceptions.AccountIdNotExistedException;
+import ojt.management.common.exceptions.AccountNotExistedException;
 import ojt.management.common.exceptions.ApplicationNotExistedException;
 import ojt.management.common.exceptions.NotPermissionException;
 import ojt.management.common.payload.request.ApplicationCreateRequest;
@@ -40,21 +40,25 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public Application getAppById(Long id, Long accountId)
-            throws ApplicationNotExistedException, AccountIdNotExistedException {
+            throws ApplicationNotExistedException, AccountNotExistedException, NotPermissionException {
         if (Boolean.FALSE.equals(applicationRepository.existsById(id))) {
             throw new ApplicationNotExistedException();
         }
         if (Boolean.FALSE.equals(accountRepository.existsById(id))) {
-            throw new AccountIdNotExistedException();
+            throw new AccountNotExistedException();
         }
         Account account = accountRepository.getById(accountId);
+        Application application = applicationRepository.getById(id);
         if (account.getRepresentative() != null) {
-            return applicationRepository.getAppRep(id, account.getRepresentative().getCompany().getId());
+            if (!application.getJob().getCompany().equals(account.getRepresentative().getCompany())){
+                throw new NotPermissionException();
+            }
         } else if (account.getStudent() != null) {
-            return applicationRepository.getAppStudent(id, account.getStudent().getId());
-        } else {
-            return applicationRepository.getById(id);
+            if (!application.getStudent().equals(account.getStudent())){
+                throw new NotPermissionException();
+            }
         }
+        return application;
     }
 
     @Override
@@ -90,23 +94,26 @@ public class ApplicationServiceImpl implements ApplicationService {
         Account account = accountRepository.getById(accountId);
         //Company accept application
         //Company id of application == company id of account
-        if (application.getJob().getCompany().getId() == account.getRepresentative().getCompany().getId()) {
-            if (!application.isStudentConfirmed()) {
-                application.setCompanyAccepted(applicationUpdateRequest.isCompanyAccepted());
-                application.setAcceptedAt(new Timestamp(System.currentTimeMillis()));
-            } else {
-                throw new NotPermissionException();
+        if (account.getRepresentative() != null) {
+            if (application.getJob().getCompany().equals(account.getRepresentative().getCompany())) {
+                if (!application.isStudentConfirmed()) {
+                    application.setCompanyAccepted(applicationUpdateRequest.isCompanyAccepted());
+                    application.setAcceptedAt(new Timestamp(System.currentTimeMillis()));
+                } else {
+                    throw new NotPermissionException();
+                }
             }
-        }
-        //student account id of application == student account id of account
-        if (application.getStudent().getAccount().getId() == account.getStudent().getAccount().getId()) {
-            //Student confirm application
-            if (application.isCompanyAccepted()) {
-                application.setStudentConfirmed(applicationUpdateRequest.isStudentConfirmed());
-                application.setConfirmedAt(new Timestamp(System.currentTimeMillis()));
+        } else if (account.getStudent() != null) {
+            //student account id of application == student account id of account
+            if (application.getStudent().getAccount().equals(account.getStudent().getAccount())) {
+                //Student confirm application
+                if (application.isCompanyAccepted()) {
+                    application.setStudentConfirmed(applicationUpdateRequest.isStudentConfirmed());
+                    application.setConfirmedAt(new Timestamp(System.currentTimeMillis()));
+                }
+                //Student update exp
+                application.setExperience(applicationUpdateRequest.getExperience());
             }
-            //Student update exp
-            application.setExperience(applicationUpdateRequest.getExperience());
         }
         return applicationRepository.save(application);
     }

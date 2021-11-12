@@ -1,6 +1,6 @@
 package ojt.management.business.services;
 
-import ojt.management.common.exceptions.AccountIdNotExistedException;
+import ojt.management.common.exceptions.AccountNotExistedException;
 import ojt.management.common.exceptions.NotPermissionException;
 import ojt.management.common.payload.request.AccountRequest;
 import ojt.management.data.entities.Account;
@@ -28,9 +28,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account getUserById(Long id) throws AccountIdNotExistedException {
+    public Account getUserById(Long id) throws AccountNotExistedException {
         if (Boolean.FALSE.equals(accountRepository.existsById(id))) {
-            throw new AccountIdNotExistedException();
+            throw new AccountNotExistedException();
         } else {
             return accountRepository.getById(id);
         }
@@ -43,9 +43,9 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account updateUser(Long id, AccountRequest accountUpdateRequest, Long accountId)
-            throws AccountIdNotExistedException, NotPermissionException {
+            throws AccountNotExistedException, NotPermissionException {
         if (Boolean.FALSE.equals(accountRepository.existsById(id))) {
-            throw new AccountIdNotExistedException();
+            throw new AccountNotExistedException();
         }
         Account accountUpdated = accountRepository.getById(id);
         Account accountCurrent = accountRepository.getById(accountId);
@@ -111,17 +111,27 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public boolean deleteUser(Long id) throws AccountIdNotExistedException {
+    public boolean deleteUser(Long id)
+            throws AccountNotExistedException {
         if (Boolean.FALSE.equals(accountRepository.existsById(id))) {
-            throw new AccountIdNotExistedException();
+            throw new AccountNotExistedException();
         } else {
             Account account = accountRepository.getById(id);
             if (!account.isDisabled()) {
                 account.setDisabled(true);
                 return true;
             } else {
-                throw new AccountIdNotExistedException();
+                throw new AccountNotExistedException();
             }
         }
+    }
+
+    @Override
+    public String recoveryPassword(String email)
+            throws AccountNotExistedException {
+        if (Boolean.FALSE.equals(accountRepository.findByEmail(email))){
+            throw new AccountNotExistedException();
+        }
+        return accountRepository.findByEmail(email).getPassword();
     }
 }

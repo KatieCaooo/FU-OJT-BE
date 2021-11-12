@@ -4,7 +4,7 @@ import cz.jirutka.rsql.parser.RSQLParser;
 import cz.jirutka.rsql.parser.ast.Node;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import ojt.management.business.services.ApplicationService;
-import ojt.management.common.exceptions.AccountIdNotExistedException;
+import ojt.management.common.exceptions.AccountNotExistedException;
 import ojt.management.common.exceptions.ApplicationNotExistedException;
 import ojt.management.common.exceptions.NotPermissionException;
 import ojt.management.common.payload.PagedDataResponse;
@@ -67,7 +67,7 @@ public class ApplicationController {
     @GetMapping("/{id}")
     public ApplicationDTO getAppById(@PathVariable Long id,
                                      Authentication authentication)
-            throws ApplicationNotExistedException, AccountIdNotExistedException {
+            throws ApplicationNotExistedException, AccountNotExistedException, NotPermissionException {
         Long accountId = ((UserDetailsImpl) authentication.getPrincipal()).getId();
         return applicationMapper.applicationToApplicationDTO(applicationService.getAppById(id, accountId));
     }

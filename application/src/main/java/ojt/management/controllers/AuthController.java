@@ -3,13 +3,11 @@ package ojt.management.controllers;
 
 import ojt.management.business.services.AccountService;
 import ojt.management.common.exceptions.*;
-import ojt.management.common.payload.DataResponse;
-import ojt.management.common.payload.JwtResponse;
-import ojt.management.common.payload.Response;
-import ojt.management.common.payload.TokenRefreshResponse;
+import ojt.management.common.payload.*;
 import ojt.management.common.payload.dto.UserDTO;
 import ojt.management.common.payload.request.LoginRequest;
 import ojt.management.common.payload.request.AccountRequest;
+import ojt.management.common.payload.request.RecoveryRequest;
 import ojt.management.common.payload.request.TokenRefreshRequest;
 import ojt.management.configuration.security.services.RefreshTokenService;
 import ojt.management.configuration.security.services.UserDetailsImpl;
@@ -90,8 +88,14 @@ public class AuthController {
         this.refreshTokenService = refreshTokenService;
     }
 
+    @PostMapping("/recovery")
+    public ResponseEntity<PasswordResponse> recoveryPassword(@Valid @RequestBody RecoveryRequest recoveryRequest) throws AccountNotExistedException {
+        String password = accountService.recoveryPassword(recoveryRequest.getEmail());
+        return ResponseEntity.ok(new PasswordResponse("Ok","This is your password",password));
+    }
+
     @PostMapping("/signin")
-    public ResponseEntity<JwtResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) throws AccountIdNotExistedException {
+    public ResponseEntity<JwtResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) throws AccountNotExistedException {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));

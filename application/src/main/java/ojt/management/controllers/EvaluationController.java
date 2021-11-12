@@ -4,7 +4,7 @@ import cz.jirutka.rsql.parser.RSQLParser;
 import cz.jirutka.rsql.parser.ast.Node;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import ojt.management.business.services.EvaluationService;
-import ojt.management.common.exceptions.AccountIdNotExistedException;
+import ojt.management.common.exceptions.AccountNotExistedException;
 import ojt.management.common.exceptions.EvaluationIdNotExistedException;
 import ojt.management.common.exceptions.NotPermissionException;
 import ojt.management.common.payload.PagedDataResponse;
@@ -67,7 +67,7 @@ public class EvaluationController {
     @GetMapping("/{id}")
     public EvaluationDTO getEvaluationById(@PathVariable Long id,
                                            Authentication authentication)
-            throws EvaluationIdNotExistedException, AccountIdNotExistedException {
+            throws EvaluationIdNotExistedException, AccountNotExistedException, NotPermissionException {
         Long accountId = ((UserDetailsImpl) authentication.getPrincipal()).getId();
         return evaluationMapper.evaluationToEvaluationDTO(evaluationService.getEvaluationById(id, accountId));
     }
