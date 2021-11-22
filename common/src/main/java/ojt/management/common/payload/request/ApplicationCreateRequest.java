@@ -21,7 +21,4 @@ public class ApplicationCreateRequest implements Serializable {
     @NotNull
     private Long jobId;
 
-    @NotNull
-    private Long accountId;
-
 }
