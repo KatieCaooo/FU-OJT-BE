@@ -21,9 +21,11 @@ public class SemesterServiceImpl implements SemesterService {
     }
 
     @Override
-    public Semester getById(Long id) throws SemesterNotExistedException {
+    public Semester getById(Long id) throws SemesterNotExistedException, SemesterDisabledException {
         if (Boolean.FALSE.equals(semesterRepository.existsById(id))) {
             throw new SemesterNotExistedException();
+        } else if (semesterRepository.getById(id).isDisabled() == true){
+            throw new SemesterDisabledException();
         } else
             return semesterRepository.getById(id);
     }
