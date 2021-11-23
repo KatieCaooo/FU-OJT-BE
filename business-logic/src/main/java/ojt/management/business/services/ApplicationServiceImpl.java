@@ -93,8 +93,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         Account account = accountRepository.getById(accountId);
         if (account.isAdmin()) {
             application.setSchoolDenied(applicationUpdateRequest.isSchoolDenied());
-        }
-        if (!account.isAdmin() && application.isSchoolDenied()) {
+        } else if (!account.isAdmin() && !application.isSchoolDenied()) {
             //Company accept application
             //Company id of application == company id of account
             if (application.getJob().getCompany().getId() == account.getRepresentative().getCompany().getId()) {
