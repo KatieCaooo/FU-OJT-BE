@@ -7,6 +7,7 @@ import ojt.management.common.payload.request.ApplicationCreateRequest;
 import ojt.management.common.payload.request.ApplicationUpdateRequest;
 import ojt.management.data.entities.Account;
 import ojt.management.data.entities.Application;
+import ojt.management.data.entities.Attachment;
 import ojt.management.data.entities.Job;
 import ojt.management.data.repositories.AccountRepository;
 import ojt.management.data.repositories.ApplicationRepository;
@@ -17,6 +18,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.stream.Collectors;
 
 @Service
 public class ApplicationServiceImpl implements ApplicationService {
@@ -121,6 +123,8 @@ public class ApplicationServiceImpl implements ApplicationService {
         application.setStudent(account.getStudent());
         application.setStudentConfirmed(false);
         application.setCompanyAccepted(false);
+        application.setAttachments(applicationCreateRequest.getAttachments().stream()
+                .map(attachmentDTO -> new Attachment(attachmentDTO.getKey())).collect(Collectors.toSet()));
         applicationRepository.save(application);
         return application;
     }
