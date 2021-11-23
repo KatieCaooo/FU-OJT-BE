@@ -1,6 +1,7 @@
 package ojt.management.business.services;
 
 import ojt.management.common.exceptions.AccountIdNotExistedException;
+import ojt.management.common.exceptions.ApplicationDenied;
 import ojt.management.common.exceptions.ApplicationNotExistedException;
 import ojt.management.common.exceptions.NotPermissionException;
 import ojt.management.common.payload.request.ApplicationCreateRequest;
@@ -80,7 +81,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public Application updateApplication(Long id, ApplicationUpdateRequest applicationUpdateRequest, Long accountId)
-            throws ApplicationNotExistedException, NotPermissionException {
+            throws ApplicationNotExistedException, NotPermissionException, ApplicationDenied {
         if (Boolean.FALSE.equals(applicationRepository.existsById(id))) {
             throw new ApplicationNotExistedException();
         }
@@ -93,7 +94,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         if (account.isAdmin()) {
             application.setSchoolDenied(applicationUpdateRequest.isSchoolDenied());
         }
-        if (!application.isSchoolDenied()) {
+        if (!account.isAdmin() && application.isSchoolDenied()) {
             //Company accept application
             //Company id of application == company id of account
             if (application.getJob().getCompany().getId() == account.getRepresentative().getCompany().getId()) {
@@ -115,7 +116,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                 application.setExperience(applicationUpdateRequest.getExperience());
             }
         } else {
-            throw new NotPermissionException();
+            throw new ApplicationDenied();
         }
         return applicationRepository.save(application);
     }

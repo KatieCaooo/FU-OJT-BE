@@ -5,6 +5,7 @@ import cz.jirutka.rsql.parser.ast.Node;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import ojt.management.business.services.ApplicationService;
 import ojt.management.common.exceptions.AccountIdNotExistedException;
+import ojt.management.common.exceptions.ApplicationDenied;
 import ojt.management.common.exceptions.ApplicationNotExistedException;
 import ojt.management.common.exceptions.NotPermissionException;
 import ojt.management.common.payload.PagedDataResponse;
@@ -72,15 +73,15 @@ public class ApplicationController {
         return applicationMapper.applicationToApplicationDTO(applicationService.getAppById(id, accountId));
     }
 
-    @PreAuthorize("hasAnyAuthority('COMPANY_REPRESENTATIVE', 'STUDENT')")
+    @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'COMPANY_REPRESENTATIVE', 'STUDENT')")
     @PutMapping("/{id}")
     public ApplicationDTO updateApplication(@Valid @RequestBody ApplicationUpdateRequest applicationUpdateRequest,
                                             @PathVariable Long id,
                                             Authentication authentication)
-            throws ApplicationNotExistedException, NotPermissionException {
+            throws ApplicationNotExistedException, NotPermissionException, ApplicationDenied {
         Long accountId = ((UserDetailsImpl) authentication.getPrincipal()).getId();
-        return applicationMapper.applicationToApplicationDTO(
-                applicationService.updateApplication(id, applicationUpdateRequest, accountId));
+            return applicationMapper.applicationToApplicationDTO(
+                    applicationService.updateApplication(id, applicationUpdateRequest, accountId));
     }
 
     @PreAuthorize("hasAnyAuthority('STUDENT')")
