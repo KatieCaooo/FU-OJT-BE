@@ -12,6 +12,9 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class ApplicationUpdateRequest extends ApplicationCreateRequest implements Serializable {
     @NotNull
+    private boolean isSchoolDenied;
+
+    @NotNull
     private boolean isCompanyAccepted;
 
     @NotNull

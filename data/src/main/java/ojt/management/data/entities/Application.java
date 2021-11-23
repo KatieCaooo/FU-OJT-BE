@@ -30,6 +30,9 @@ public class Application implements Serializable {
     @Column(name = "experience", length = 1000)
     private String experience;
 
+    @Column(name = "is_school_denied", columnDefinition = "BOOLEAN DEFAULT false")
+    private boolean isSchoolDenied;
+
     @Column(name = "is_company_accepted", columnDefinition = "BOOLEAN DEFAULT false")
     private boolean isCompanyAccepted;
 

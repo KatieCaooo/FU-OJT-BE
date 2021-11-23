@@ -90,25 +90,32 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
 
         Account account = accountRepository.getById(accountId);
-        //Company accept application
-        //Company id of application == company id of account
-        if (application.getJob().getCompany().getId() == account.getRepresentative().getCompany().getId()) {
-            if (!application.isStudentConfirmed()) {
-                application.setCompanyAccepted(applicationUpdateRequest.isCompanyAccepted());
-                application.setAcceptedAt(new Timestamp(System.currentTimeMillis()));
-            } else {
-                throw new NotPermissionException();
-            }
+        if (account.isAdmin()) {
+            application.setSchoolDenied(applicationUpdateRequest.isSchoolDenied());
         }
-        //student account id of application == student account id of account
-        if (application.getStudent().getAccount().getId() == account.getStudent().getAccount().getId()) {
-            //Student confirm application
-            if (application.isCompanyAccepted()) {
-                application.setStudentConfirmed(applicationUpdateRequest.isStudentConfirmed());
-                application.setConfirmedAt(new Timestamp(System.currentTimeMillis()));
+        if (!application.isSchoolDenied()) {
+            //Company accept application
+            //Company id of application == company id of account
+            if (application.getJob().getCompany().getId() == account.getRepresentative().getCompany().getId()) {
+                if (!application.isStudentConfirmed()) {
+                    application.setCompanyAccepted(applicationUpdateRequest.isCompanyAccepted());
+                    application.setAcceptedAt(new Timestamp(System.currentTimeMillis()));
+                } else {
+                    throw new NotPermissionException();
+                }
             }
-            //Student update exp
-            application.setExperience(applicationUpdateRequest.getExperience());
+            //student account id of application == student account id of account
+            if (application.getStudent().getAccount().getId() == account.getStudent().getAccount().getId()) {
+                //Student confirm application
+                if (application.isCompanyAccepted()) {
+                    application.setStudentConfirmed(applicationUpdateRequest.isStudentConfirmed());
+                    application.setConfirmedAt(new Timestamp(System.currentTimeMillis()));
+                }
+                //Student update exp
+                application.setExperience(applicationUpdateRequest.getExperience());
+            }
+        } else {
+            throw new NotPermissionException();
         }
         return applicationRepository.save(application);
     }
