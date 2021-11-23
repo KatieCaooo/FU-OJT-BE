@@ -44,7 +44,7 @@ public class ApplicationController {
         this.applicationMapper = applicationMapper;
     }
 
-    @PreAuthorize("hasAnyAuthority('COMPANY_REPRESENTATIVE', 'STUDENT')")
+    @PreAuthorize("hasAnyAuthority('COMPANY_REPRESENTATIVE', 'STUDENT', 'SYS_ADMIN')")
     @GetMapping()
     public PagedDataResponse<ApplicationDTO> searchApplication(@RequestParam(value = "search", required = false) String search,
                                                                @RequestParam(value = "pageNo", required = false, defaultValue = "0") Integer pageNo,
