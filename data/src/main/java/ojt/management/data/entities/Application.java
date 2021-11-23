@@ -61,7 +61,7 @@ public class Application implements Serializable {
     private Evaluation evaluation;
 
     @ManyToOne
-    @JoinColumn(name = "account_id", nullable = false)
+    @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
     @ManyToOne
