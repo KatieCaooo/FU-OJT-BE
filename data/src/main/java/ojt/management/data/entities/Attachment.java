@@ -46,4 +46,8 @@ public class Attachment implements Serializable {
         this.name = name;
         this.accountId = accountId;
     }
+
+    public Attachment(String key) {
+        this.key = key;
+    }
 }

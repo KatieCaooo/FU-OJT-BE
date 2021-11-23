@@ -1,12 +1,14 @@
 package ojt.management.business.services;
 
 import ojt.management.common.exceptions.AccountIdNotExistedException;
+import ojt.management.common.exceptions.ApplicationDenied;
 import ojt.management.common.exceptions.ApplicationNotExistedException;
 import ojt.management.common.exceptions.NotPermissionException;
 import ojt.management.common.payload.request.ApplicationCreateRequest;
 import ojt.management.common.payload.request.ApplicationUpdateRequest;
 import ojt.management.data.entities.Account;
 import ojt.management.data.entities.Application;
+import ojt.management.data.entities.Attachment;
 import ojt.management.data.entities.Job;
 import ojt.management.data.repositories.AccountRepository;
 import ojt.management.data.repositories.ApplicationRepository;
@@ -17,6 +19,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.stream.Collectors;
 
 @Service
 public class ApplicationServiceImpl implements ApplicationService {
@@ -78,7 +81,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public Application updateApplication(Long id, ApplicationUpdateRequest applicationUpdateRequest, Long accountId)
-            throws ApplicationNotExistedException, NotPermissionException {
+            throws ApplicationNotExistedException, NotPermissionException, ApplicationDenied {
         if (Boolean.FALSE.equals(applicationRepository.existsById(id))) {
             throw new ApplicationNotExistedException();
         }
@@ -88,25 +91,32 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
 
         Account account = accountRepository.getById(accountId);
-        //Company accept application
-        //Company id of application == company id of account
-        if (application.getJob().getCompany().getId() == account.getRepresentative().getCompany().getId()) {
-            if (!application.isStudentConfirmed()) {
-                application.setCompanyAccepted(applicationUpdateRequest.isCompanyAccepted());
-                application.setAcceptedAt(new Timestamp(System.currentTimeMillis()));
-            } else {
-                throw new NotPermissionException();
-            }
+        if (account.isAdmin()) {
+            application.setSchoolDenied(applicationUpdateRequest.isSchoolDenied());
         }
-        //student account id of application == student account id of account
-        if (application.getStudent().getAccount().getId() == account.getStudent().getAccount().getId()) {
-            //Student confirm application
-            if (application.isCompanyAccepted()) {
-                application.setStudentConfirmed(applicationUpdateRequest.isStudentConfirmed());
-                application.setConfirmedAt(new Timestamp(System.currentTimeMillis()));
+        if (!account.isAdmin() && application.isSchoolDenied()) {
+            //Company accept application
+            //Company id of application == company id of account
+            if (application.getJob().getCompany().getId() == account.getRepresentative().getCompany().getId()) {
+                if (!application.isStudentConfirmed()) {
+                    application.setCompanyAccepted(applicationUpdateRequest.isCompanyAccepted());
+                    application.setAcceptedAt(new Timestamp(System.currentTimeMillis()));
+                } else {
+                    throw new NotPermissionException();
+                }
             }
-            //Student update exp
-            application.setExperience(applicationUpdateRequest.getExperience());
+            //student account id of application == student account id of account
+            if (application.getStudent().getAccount().getId() == account.getStudent().getAccount().getId()) {
+                //Student confirm application
+                if (application.isCompanyAccepted()) {
+                    application.setStudentConfirmed(applicationUpdateRequest.isStudentConfirmed());
+                    application.setConfirmedAt(new Timestamp(System.currentTimeMillis()));
+                }
+                //Student update exp
+                application.setExperience(applicationUpdateRequest.getExperience());
+            }
+        } else {
+            throw new ApplicationDenied();
         }
         return applicationRepository.save(application);
     }
@@ -121,6 +131,8 @@ public class ApplicationServiceImpl implements ApplicationService {
         application.setStudent(account.getStudent());
         application.setStudentConfirmed(false);
         application.setCompanyAccepted(false);
+        application.setAttachments(applicationCreateRequest.getAttachments().stream()
+                .map(attachmentDTO -> new Attachment(attachmentDTO.getKey())).collect(Collectors.toSet()));
         applicationRepository.save(application);
         return application;
     }
