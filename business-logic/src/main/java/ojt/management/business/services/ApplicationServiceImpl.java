@@ -4,6 +4,7 @@ import ojt.management.common.exceptions.AccountIdNotExistedException;
 import ojt.management.common.exceptions.ApplicationDenied;
 import ojt.management.common.exceptions.ApplicationNotExistedException;
 import ojt.management.common.exceptions.NotPermissionException;
+import ojt.management.common.payload.dto.AttachmentDTO;
 import ojt.management.common.payload.request.ApplicationCreateRequest;
 import ojt.management.common.payload.request.ApplicationUpdateRequest;
 import ojt.management.data.entities.Account;
@@ -12,13 +13,17 @@ import ojt.management.data.entities.Attachment;
 import ojt.management.data.entities.Job;
 import ojt.management.data.repositories.AccountRepository;
 import ojt.management.data.repositories.ApplicationRepository;
+import ojt.management.data.repositories.AttachmentRepository;
 import ojt.management.data.repositories.JobRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.sql.Timestamp;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,13 +32,15 @@ public class ApplicationServiceImpl implements ApplicationService {
     private final ApplicationRepository applicationRepository;
     private final JobRepository jobRepository;
     private final AccountRepository accountRepository;
+    private final AttachmentRepository attachmentRepository;
 
     public ApplicationServiceImpl(ApplicationRepository applicationRepository,
                                   JobRepository jobRepository,
-                                  AccountRepository accountRepository) {
+                                  AccountRepository accountRepository, AttachmentRepository attachmentRepository) {
         this.applicationRepository = applicationRepository;
         this.jobRepository = jobRepository;
         this.accountRepository = accountRepository;
+        this.attachmentRepository = attachmentRepository;
     }
 
     @Override
@@ -121,6 +128,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
+    @Transactional
     public Application createApplication(ApplicationCreateRequest applicationCreateRequest, Long accountId) {
         Account account = accountRepository.getById(accountId);
         Job job = jobRepository.getById(applicationCreateRequest.getJobId());
@@ -130,9 +138,17 @@ public class ApplicationServiceImpl implements ApplicationService {
         application.setStudent(account.getStudent());
         application.setStudentConfirmed(false);
         application.setCompanyAccepted(false);
-        application.setAttachments(applicationCreateRequest.getAttachments().stream()
-                .map(attachmentDTO -> new Attachment(attachmentDTO.getKey())).collect(Collectors.toSet()));
-        applicationRepository.save(application);
+        application = applicationRepository.save(application);
+
+        List<String> attachmentKeys = applicationCreateRequest
+                .getAttachments().stream().map(AttachmentDTO::getKey).collect(Collectors.toList());
+        if(!attachmentKeys.isEmpty() && attachmentKeys.stream().allMatch(key -> !key.isEmpty())){
+            List<Attachment> attachments = attachmentRepository.findAllByKeyIn(attachmentKeys);
+            Application finalApplication = application;
+            attachments.forEach(attachment -> attachment.setApplication(finalApplication));
+            attachmentRepository.saveAll(attachments);
+        }
+        application = applicationRepository.getById(application.getId());
         return application;
     }
 }
