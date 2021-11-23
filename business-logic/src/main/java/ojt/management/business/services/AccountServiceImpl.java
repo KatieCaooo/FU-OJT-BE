@@ -31,9 +31,12 @@ public class AccountServiceImpl implements AccountService {
     public Account getUserById(Long id) throws AccountIdNotExistedException {
         if (Boolean.FALSE.equals(accountRepository.existsById(id))) {
             throw new AccountIdNotExistedException();
-        } else {
-            return accountRepository.getById(id);
         }
+        Account account = accountRepository.getById(id);
+        if (account.isDisabled() == true) {
+            throw new AccountIdNotExistedException();
+        }
+        return account;
     }
 
     @Override
@@ -116,7 +119,7 @@ public class AccountServiceImpl implements AccountService {
             throw new AccountIdNotExistedException();
         } else {
             Account account = accountRepository.getById(id);
-            if (!account.isDisabled()) {
+            if (account.isDisabled() == false) {
                 account.setDisabled(true);
                 return true;
             } else {
