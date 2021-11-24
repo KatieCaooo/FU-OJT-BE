@@ -19,5 +19,5 @@ public class ApplicationDTO implements Serializable {
     private boolean isSchoolDenied;
     private StudentDTO student;
     private JobDTO job;
-    private Set<Attachment> attachments;
+    private Set<AttachmentDTO> attachments;
 }
