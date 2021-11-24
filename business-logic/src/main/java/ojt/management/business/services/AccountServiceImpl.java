@@ -121,6 +121,7 @@ public class AccountServiceImpl implements AccountService {
             Account account = accountRepository.getById(id);
             if (account.isDisabled() == false) {
                 account.setDisabled(true);
+                accountRepository.save(account);
                 return true;
             } else {
                 throw new AccountIdNotExistedException();

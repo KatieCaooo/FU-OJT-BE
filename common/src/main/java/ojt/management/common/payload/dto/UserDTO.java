@@ -20,4 +20,5 @@ public class UserDTO implements Serializable {
     private CompanyDTO company;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+    private boolean isDisabled;
 }
