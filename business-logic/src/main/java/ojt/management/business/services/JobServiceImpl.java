@@ -47,9 +47,15 @@ public class JobServiceImpl implements JobService {
             if (jobRepository.getJobByRep(repCompanyId, id) == null) {
                 throw new JobNotExistedException();
             }
+            if (jobRepository.getById(id).isDisabled() == true){
+                throw new JobNotExistedException();
+            }
             return jobRepository.getJobByRep(repCompanyId, id);
         } else { //The other role can get all
             if (Boolean.FALSE.equals(jobRepository.existsById(id))) {
+                throw new JobNotExistedException();
+            }
+            if (jobRepository.getById(id).isDisabled() == true){
                 throw new JobNotExistedException();
             }
             return jobRepository.getById(id);
@@ -59,6 +65,9 @@ public class JobServiceImpl implements JobService {
     @Override
     public Job updateJob(Long idJob, JobRequest jobUpdateRequest, Long accountId) throws CrudException {
         if (!jobRepository.existsById(idJob)) {
+            throw new JobNotExistedException();
+        }
+        if (jobRepository.getById(idJob).isDisabled() == true){
             throw new JobNotExistedException();
         }
         //Check authen: the Rep only can edit their own job
@@ -80,20 +89,26 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public boolean deleteJob(Long id, Long accountId) throws JobNotExistedException {
+        if (Boolean.FALSE.equals(jobRepository.existsById(id))) {
+            throw new JobNotExistedException();
+        }
         //Check authen: the Rep only can delete their own job
-        Long currentJob = jobRepository.getById(id).getId();
-        Long repCompanyId = accountRepository.getById(accountId).getRepresentative().getCompany().getId();
-
-        if (currentJob.equals(repCompanyId)) {
-            if (Boolean.FALSE.equals(jobRepository.existsById(id))) {
-                throw new JobNotExistedException();
-            } else {
-                Job job = jobRepository.getById(id);
+        Long currentCompany = jobRepository.getById(id).getCompany().getId();
+        Account account = accountRepository.getById(accountId);
+        Job job = jobRepository.getById(id);
+        if (account.isAdmin()) {
+            if (!job.isDisabled()) {
+                job.setDisabled(true);
+                jobRepository.save(job);
+                return true;
+            }
+        } else {
+            if (currentCompany.equals(account.getRepresentative().getCompany().getId())) {
                 if (!job.isDisabled()) {
                     job.setDisabled(true);
                     jobRepository.save(job);
+                    return true;
                 }
-                return true;
             }
         }
         return false;
