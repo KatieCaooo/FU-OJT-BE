@@ -40,4 +40,10 @@ public class Attachment implements Serializable {
 
     @ManyToOne
     private Application application;
+
+    public Attachment(String key, String name, Long accountId) {
+        this.key = key;
+        this.name = name;
+        this.accountId = accountId;
+    }
 }
