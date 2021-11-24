@@ -47,6 +47,12 @@ public class BucketController {
                 .map(file -> attachmentMapper.attachmentToAttachmentDTO(file)).collect(Collectors.toList());
     }
 
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public AttachmentDTO uploadAvatar(@RequestParam(value = "files") MultipartFile files, Authentication authentication) {
+        Long accountId = ((UserDetailsImpl) authentication.getPrincipal()).getId();
+        return attachmentMapper.attachmentToAttachmentDTO(amazonClientService.uploadAvatar(files, accountId));
+    }
+
     @GetMapping("/{key}")
     public ResponseEntity<?> downloadFile(@PathVariable("key") String key){
         S3Object object = amazonClientService.downloadFile(key);

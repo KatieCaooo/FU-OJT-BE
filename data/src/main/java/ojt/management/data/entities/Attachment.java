@@ -7,12 +7,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
@@ -40,6 +35,9 @@ public class Attachment implements Serializable {
 
     @ManyToOne
     private Application application;
+
+    @OneToOne
+    private Account account;
 
     public Attachment(String key, String name, Long accountId) {
         this.key = key;

@@ -3,6 +3,7 @@ package ojt.management.common.payload.request;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ojt.management.common.payload.dto.AttachmentDTO;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -22,9 +23,6 @@ public class AccountRequest implements Serializable {
     @NotNull
     @Size(min = 8, max = 1024)
     private String password;
-
-    @Size(max = 2048)
-    private String avatar;
 
     @NotNull
     @NotBlank
@@ -77,18 +75,26 @@ public class AccountRequest implements Serializable {
      * End of student Section
      **/
 
+    /**
+     * Start of attachment Section
+     **/
+    private AttachmentDTO avatar;
+
+    /**
+     * End of attachment Section
+     **/
+
     // Constructor or admin creation
-    public AccountRequest(String email, String password, String name, String role, String phone, String avatar) {
+    public AccountRequest(String email, String password, String name, String role, String phone) {
         this.email = email;
         this.password = password;
         this.name = name;
         this.role = role;
         this.phone = phone;
-        this.avatar = avatar;
     }
 
     // constructor for representative
-    public AccountRequest(String email, String password, String name, String role, String companyName, String description, String companyAddress, String phone, String avatar) {
+    public AccountRequest(String email, String password, String name, String role, String companyName, String description, String companyAddress, String phone) {
         this.email = email;
         this.password = password;
         this.name = name;
@@ -97,11 +103,10 @@ public class AccountRequest implements Serializable {
         this.description = description;
         this.companyAddress = companyAddress;
         this.phone = phone;
-        this.avatar = avatar;
     }
 
     // constructor for student
-    public AccountRequest(String email, String password, String name, String role, String phone, String address, String studentCode, Long majorId, Long semesterId, String avatar) {
+    public AccountRequest(String email, String password, String name, String role, String phone, String address, String studentCode, Long majorId, Long semesterId) {
         this.email = email;
         this.password = password;
         this.name = name;
@@ -111,15 +116,13 @@ public class AccountRequest implements Serializable {
         this.studentCode = studentCode;
         this.majorId = majorId;
         this.semesterId = semesterId;
-        this.avatar = avatar;
-
     }
 
     /**
      * Start of Update Section
      **/
     //constructor for admin update student
-    public AccountRequest(String email, String password, String name, String phone, String address, String studentCode, Long majorId, Long semesterId, String avatar) {
+    public AccountRequest(String email, String password, String name, String phone, String address, String studentCode, Long majorId, Long semesterId, AttachmentDTO avatar) {
         this.email = email;
         this.password = password;
         this.name = name;
@@ -129,26 +132,23 @@ public class AccountRequest implements Serializable {
         this.majorId = majorId;
         this.semesterId = semesterId;
         this.avatar = avatar;
-
     }
 
     //constructor for admin update rep
-    public AccountRequest(String email, String password, String name, String phone, String avatar) {
+    public AccountRequest(String email, String password, String name, String phone, AttachmentDTO avatar) {
         this.email = email;
         this.password = password;
         this.name = name;
         this.phone = phone;
         this.avatar = avatar;
-
     }
 
     //constructor for student update
-    public AccountRequest(String password, String phone, String address, String avatar) {
+    public AccountRequest(String password, String phone, String address, AttachmentDTO avatar) {
         this.password = password;
         this.phone = phone;
         this.address = address;
         this.avatar = avatar;
-
     }
     /**
      * End of Update Section

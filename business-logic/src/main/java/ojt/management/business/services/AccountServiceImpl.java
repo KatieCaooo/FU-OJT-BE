@@ -4,7 +4,9 @@ import ojt.management.common.exceptions.AccountIdNotExistedException;
 import ojt.management.common.exceptions.NotPermissionException;
 import ojt.management.common.payload.request.AccountRequest;
 import ojt.management.data.entities.Account;
+import ojt.management.data.entities.Attachment;
 import ojt.management.data.repositories.AccountRepository;
+import ojt.management.data.repositories.AttachmentRepository;
 import ojt.management.data.repositories.MajorRepository;
 import ojt.management.data.repositories.SemesterRepository;
 import org.springframework.data.domain.Page;
@@ -18,13 +20,16 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final MajorRepository majorRepository;
     private final SemesterRepository semesterRepository;
+    private final AttachmentRepository attachmentRepository;
 
     public AccountServiceImpl(AccountRepository accountRepository,
                               MajorRepository majorRepository,
-                              SemesterRepository semesterRepository) {
+                              SemesterRepository semesterRepository,
+                              AttachmentRepository attachmentRepository) {
         this.accountRepository = accountRepository;
         this.majorRepository = majorRepository;
         this.semesterRepository = semesterRepository;
+        this.attachmentRepository = attachmentRepository;
     }
 
     @Override
@@ -44,20 +49,33 @@ public class AccountServiceImpl implements AccountService {
         return accountRepository.findAll(specification, pageable);
     }
 
+    private Account avatarId(Account accountUpdated, AccountRequest accountUpdateRequest){
+        if (accountUpdateRequest.getAvatar() != null) {
+            String avatarKey = accountUpdateRequest.getAvatar().getKey();
+            if (!avatarKey.isEmpty()) {
+                Attachment avatar = attachmentRepository.findByKey(avatarKey);
+                attachmentRepository.save(avatar);
+            }
+            accountUpdated = accountRepository.getById(accountUpdated.getId());
+        }
+        return accountUpdated;
+    }
+
     @Override
     public Account updateUser(Long id, AccountRequest accountUpdateRequest, Long accountId)
             throws AccountIdNotExistedException, NotPermissionException {
         if (Boolean.FALSE.equals(accountRepository.existsById(id))) {
             throw new AccountIdNotExistedException();
         }
+
         Account accountUpdated = accountRepository.getById(id);
         Account accountCurrent = accountRepository.getById(accountId);
+
         // Update student
         if (accountUpdated.getStudent() != null && !accountUpdated.isDisabled()) { //account updated is student
             if ((accountCurrent.isAdmin())) {
                 //admin update profile for student
                 accountUpdated.setEmail(accountUpdateRequest.getEmail());
-                accountUpdated.setAvatar(accountUpdateRequest.getAvatar());
                 accountUpdated.setName(accountUpdateRequest.getName());
                 accountUpdated.setPhone(accountUpdateRequest.getPhone());
                 accountUpdated.getStudent().setAddress(accountUpdateRequest.getAddress());
@@ -67,7 +85,6 @@ public class AccountServiceImpl implements AccountService {
                 accountRepository.save(accountUpdated);
             } else if ((accountCurrent.getStudent() != null && accountUpdated.equals(accountCurrent))) {
                 //student update own profile
-                accountUpdated.setAvatar(accountUpdateRequest.getAvatar());
                 accountUpdated.setPhone(accountUpdateRequest.getPhone());
                 accountUpdated.getStudent().setAddress(accountUpdateRequest.getAddress());
                 accountRepository.save(accountUpdated);
@@ -79,7 +96,6 @@ public class AccountServiceImpl implements AccountService {
             if ((accountCurrent.isAdmin())) {
                 //admin update profile for rep
                 accountUpdated.setEmail(accountUpdateRequest.getEmail());
-                accountUpdated.setAvatar(accountUpdateRequest.getAvatar());
                 accountUpdated.setName(accountUpdateRequest.getName());
                 accountUpdated.setPhone(accountUpdateRequest.getPhone());
                 accountUpdated.getRepresentative().getCompany().setName(accountUpdateRequest.getCompanyName());
@@ -88,7 +104,6 @@ public class AccountServiceImpl implements AccountService {
                 accountRepository.save(accountUpdated);
             } else if ((accountCurrent.getRepresentative() != null && accountUpdated.equals(accountCurrent))) {
                 //rep update own profile
-                accountUpdated.setAvatar(accountUpdateRequest.getAvatar());
                 accountUpdated.setPhone(accountUpdateRequest.getPhone());
                 accountUpdated.getRepresentative().getCompany().setName(accountUpdateRequest.getCompanyName());
                 accountRepository.save(accountUpdated);
@@ -99,7 +114,6 @@ public class AccountServiceImpl implements AccountService {
         } else {
             if (accountCurrent.isAdmin()) {
                 accountUpdated.setEmail(accountUpdateRequest.getEmail());
-                accountUpdated.setAvatar(accountUpdateRequest.getAvatar());
                 accountUpdated.setName(accountUpdateRequest.getName());
                 accountUpdated.setPhone(accountUpdateRequest.getPhone());
                 accountRepository.save(accountUpdated);

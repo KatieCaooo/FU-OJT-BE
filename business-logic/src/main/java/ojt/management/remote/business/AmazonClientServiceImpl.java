@@ -87,6 +87,23 @@ public class AmazonClientServiceImpl implements AmazonClientService {
     }
 
     @Override
+    public Attachment uploadAvatar(MultipartFile multipartFile, Long accountId) {
+        Attachment avatar = new Attachment();
+        String fileName = generateFileName(multipartFile);
+        String key = UUID.randomUUID().toString();
+        while (attachmentRepository.existsById(key)) {
+            key = UUID.randomUUID().toString();
+        }
+        try {
+            uploadFileTos3bucket(fileName, multipartFile, key, accountId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return attachmentRepository.save(avatar);
+    }
+
+    @Override
     public S3Object downloadFile(String key) {
         S3Object object = s3client.getObject(bucketName, key);
         return object;

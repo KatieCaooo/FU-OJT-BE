@@ -13,4 +13,5 @@ import java.util.List;
 public interface AttachmentRepository extends JpaRepository<Attachment, String> {
 
     List<Attachment> findAllByKeyIn(List<String> keys);
+    Attachment findByKey(String key);
 }
