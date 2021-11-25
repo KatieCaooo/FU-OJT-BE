@@ -112,7 +112,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                 }
             }
             //student account id of application == student account id of account
-            if (application.getStudent().getAccount().getId() == account.getStudent().getAccount().getId()) {
+            if (application.getStudent().getAccount().getId() == account.getId()) {
                 //Student confirm application
                 if (application.isCompanyAccepted()) {
                     application.setStudentConfirmed(applicationUpdateRequest.isStudentConfirmed());
