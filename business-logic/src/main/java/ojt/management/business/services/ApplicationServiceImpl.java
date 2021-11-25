@@ -103,7 +103,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         } else if (!account.isAdmin() && !application.isSchoolDenied()) {
             //Company accept application
             //Company id of application == company id of account
-            if (application.getJob().getCompany().getId() == account.getRepresentative().getCompany().getId()) {
+            if (account.getRepresentative() != null && (application.getJob().getCompany().getId() == account.getRepresentative().getCompany().getId())) {
                 if (!application.isStudentConfirmed()) {
                     application.setCompanyAccepted(applicationUpdateRequest.isCompanyAccepted());
                     application.setAcceptedAt(new Timestamp(System.currentTimeMillis()));
