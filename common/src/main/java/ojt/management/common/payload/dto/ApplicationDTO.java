@@ -22,4 +22,5 @@ public class ApplicationDTO implements Serializable {
     private StudentDTO student;
     private JobDTO job;
     private Set<AttachmentDTO> attachments;
+    private ApplicationStudentAccountDTO account;
 }
