@@ -88,6 +88,16 @@ public class UserController {
         return userMapper.userToUserDTO(accountService.updateUser(id, accountUpdateRequest, accountId));
     }
 
+    @PreAuthorize("hasAnyAuthority('COMPANY_REPRESENTATIVE','SYS_ADMIN', 'STUDENT')")
+    @PutMapping("/password/{id}")
+    public UserDTO updatePassword(@PathVariable Long id,
+                              @Valid @RequestBody AccountRequest accountUpdateRequest,
+                              Authentication authentication)
+            throws AccountIdNotExistedException, NotPermissionException {
+        Long accountId = ((UserDetailsImpl) authentication.getPrincipal()).getId();
+        return userMapper.userToUserDTO(accountService.updatePassword(id, accountUpdateRequest, accountId));
+    }
+
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN')")
     @DeleteMapping("/{id}")
     public boolean deleteUser(@PathVariable Long id)

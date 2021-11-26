@@ -42,7 +42,7 @@ public class SemesterController {
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'STUDENT', 'COMPANY_REPRESENTATIVE')")
     @GetMapping("/{id}")
-    public SemesterDTO getById(@PathVariable Long id) throws SemesterNotExistedException {
+    public SemesterDTO getById(@PathVariable Long id) throws SemesterNotExistedException, SemesterDisabledException {
         return semesterMapper.semesterToSemesterDTO(semesterService.getById(id));
     }
 

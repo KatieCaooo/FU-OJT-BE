@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 public interface SemesterService {
-    Semester getById(Long id) throws SemesterNotExistedException;
+    Semester getById(Long id) throws SemesterNotExistedException, SemesterDisabledException;
 
     Page<Semester> searchSemester(Specification<Semester> specification, Pageable pageable);
 

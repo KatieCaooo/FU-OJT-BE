@@ -30,6 +30,9 @@ public class Application implements Serializable {
     @Column(name = "experience", length = 1000)
     private String experience;
 
+    @Column(name = "is_school_denied", columnDefinition = "BOOLEAN DEFAULT false")
+    private boolean isSchoolDenied;
+
     @Column(name = "is_company_accepted", columnDefinition = "BOOLEAN DEFAULT false")
     private boolean isCompanyAccepted;
 
@@ -61,7 +64,7 @@ public class Application implements Serializable {
     private Evaluation evaluation;
 
     @ManyToOne
-    @JoinColumn(name = "account_id", nullable = false)
+    @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
     @ManyToOne

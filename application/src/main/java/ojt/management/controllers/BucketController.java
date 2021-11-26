@@ -22,10 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/storage/")
+@RequestMapping("/storage")
 @SecurityRequirement(name = "bearerAuth")
 public class BucketController {
 
@@ -39,9 +41,10 @@ public class BucketController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public AttachmentDTO uploadFile(@RequestParam(value = "file") MultipartFile file, Authentication authentication) {
+    public List<AttachmentDTO> uploadFile(@RequestParam(value = "files") List<MultipartFile> files, Authentication authentication) {
         Long accountId = ((UserDetailsImpl) authentication.getPrincipal()).getId();
-        return attachmentMapper.attachmentToAttachmentDTO(amazonClientService.uploadFile(file, accountId));
+        return amazonClientService.uploadFile(files, accountId).stream()
+                .map(file -> attachmentMapper.attachmentToAttachmentDTO(file)).collect(Collectors.toList());
     }
 
     @GetMapping("/{key}")
