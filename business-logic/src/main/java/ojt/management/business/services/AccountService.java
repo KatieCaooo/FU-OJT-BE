@@ -15,6 +15,7 @@ public interface AccountService {
     Page<Account> searchUser(Specification<Account> specification, Pageable pageable);
 
     Account updateUser(Long id, AccountRequest accountUpdateRequest, Long accountId) throws AccountIdNotExistedException, NotPermissionException;
+    Account updatePassword(Long id, AccountRequest accountUpdateRequest, Long accountId) throws AccountIdNotExistedException, NotPermissionException;
 
     boolean deleteUser(Long id) throws AccountIdNotExistedException;
 }
