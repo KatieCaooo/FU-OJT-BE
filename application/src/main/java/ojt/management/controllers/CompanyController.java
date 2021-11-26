@@ -41,7 +41,7 @@ public class CompanyController {
         this.companyService = companyService;
     }
 
-    @PreAuthorize("hasAnyAuthority('SYS_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('SYS_ADMIN, COMPANY_REPRESENTATIVE, SYS_ADMIN')")
     @GetMapping()
     public PagedDataResponse<CompanyDTO> searchUser(@RequestParam(value = "search", required = false) String search,
                                                     @RequestParam(value = "pageNo", required = false, defaultValue = "0") Integer pageNo,
