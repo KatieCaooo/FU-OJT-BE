@@ -76,7 +76,10 @@ public class EvaluationServiceImpl implements EvaluationService {
             evaluation.setComment(evaluationCreateRequest.getComment());
             evaluation.setPass(evaluationCreateRequest.isPass());
             evaluation.setApplication(application);
-            return evaluationRepository.save(evaluation);
+            evaluation = evaluationRepository.save(evaluation);
+            application.setEvaluation(evaluation);
+            applicationRepository.save(application);
+            return evaluation;
         } else {
             throw new NotPermissionException();
         }
