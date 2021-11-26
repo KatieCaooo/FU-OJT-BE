@@ -89,7 +89,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasAnyAuthority('COMPANY_REPRESENTATIVE','SYS_ADMIN', 'STUDENT')")
-    @PutMapping("/{id}")
+    @PutMapping("/password/{id}")
     public UserDTO updatePassword(@PathVariable Long id,
                               @Valid @RequestBody AccountRequest accountUpdateRequest,
                               Authentication authentication)
