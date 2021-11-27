@@ -16,7 +16,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -64,17 +66,24 @@ public class AmazonClientServiceImpl implements AmazonClientService {
     }
 
     @Override
-    public Attachment uploadFile(MultipartFile multipartFile, Long accountId) {
-        String fileName = generateFileName(multipartFile);
-        String key = UUID.randomUUID().toString();
-        try {
-            uploadFileTos3bucket(fileName, multipartFile, key, accountId);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+    public List<Attachment> uploadFile(List<MultipartFile> multipartFiles, Long accountId) {
+        List<Attachment> attachments = new ArrayList<>();
+        for (MultipartFile multipartFile : multipartFiles) {
+            String fileName = generateFileName(multipartFile);
+            String key = UUID.randomUUID().toString();
+            while (attachmentRepository.existsById(key)) {
+                key = UUID.randomUUID().toString();
+            }
+            try {
+                uploadFileTos3bucket(fileName, multipartFile, key, accountId);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+            Attachment attachment = new Attachment(key, fileName, accountId);
+            attachments.add(attachment);
         }
-        Attachment attachment = new Attachment(key, fileName, accountId);
-        return attachmentRepository.save(attachment);
+        return attachmentRepository.saveAll(attachments);
     }
 
     @Override

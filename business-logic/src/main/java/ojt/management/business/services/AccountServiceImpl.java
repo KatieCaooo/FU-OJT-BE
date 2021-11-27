@@ -31,9 +31,12 @@ public class AccountServiceImpl implements AccountService {
     public Account getUserById(Long id) throws AccountIdNotExistedException {
         if (Boolean.FALSE.equals(accountRepository.existsById(id))) {
             throw new AccountIdNotExistedException();
-        } else {
-            return accountRepository.getById(id);
         }
+        Account account = accountRepository.getById(id);
+        if (account.isDisabled() == true) {
+            throw new AccountIdNotExistedException();
+        }
+        return account;
     }
 
     @Override
@@ -64,7 +67,6 @@ public class AccountServiceImpl implements AccountService {
                 accountRepository.save(accountUpdated);
             } else if ((accountCurrent.getStudent() != null && accountUpdated.equals(accountCurrent))) {
                 //student update own profile
-                accountUpdated.setPassword(accountUpdateRequest.getPassword());
                 accountUpdated.setAvatar(accountUpdateRequest.getAvatar());
                 accountUpdated.setPhone(accountUpdateRequest.getPhone());
                 accountUpdated.getStudent().setAddress(accountUpdateRequest.getAddress());
@@ -86,7 +88,6 @@ public class AccountServiceImpl implements AccountService {
                 accountRepository.save(accountUpdated);
             } else if ((accountCurrent.getRepresentative() != null && accountUpdated.equals(accountCurrent))) {
                 //rep update own profile
-                accountUpdated.setPassword(accountUpdateRequest.getPassword());
                 accountUpdated.setAvatar(accountUpdateRequest.getAvatar());
                 accountUpdated.setPhone(accountUpdateRequest.getPhone());
                 accountUpdated.getRepresentative().getCompany().setName(accountUpdateRequest.getCompanyName());
@@ -98,10 +99,31 @@ public class AccountServiceImpl implements AccountService {
         } else {
             if (accountCurrent.isAdmin()) {
                 accountUpdated.setEmail(accountUpdateRequest.getEmail());
-                accountUpdated.setPassword(accountUpdateRequest.getPassword());
                 accountUpdated.setAvatar(accountUpdateRequest.getAvatar());
                 accountUpdated.setName(accountUpdateRequest.getName());
                 accountUpdated.setPhone(accountUpdateRequest.getPhone());
+                accountRepository.save(accountUpdated);
+            } else {
+                throw new NotPermissionException();
+            }
+        }
+        return accountUpdated;
+    }
+
+    @Override
+    public Account updatePassword(Long id, AccountRequest accountUpdateRequest, Long accountId)
+            throws AccountIdNotExistedException, NotPermissionException {
+        if (Boolean.FALSE.equals(accountRepository.existsById(id))) {
+            throw new AccountIdNotExistedException();
+        }
+        Account accountUpdated = accountRepository.getById(id);
+        Account accountCurrent = accountRepository.getById(accountId);
+        if (accountCurrent.isAdmin()) { //Admin update account password
+            accountUpdated.setPassword(accountUpdateRequest.getPassword());
+            accountRepository.save(accountUpdated);
+        } else {
+            if (accountUpdated.equals(accountCurrent)) { //User update own
+                accountUpdated.setPassword(accountUpdateRequest.getPassword());
                 accountRepository.save(accountUpdated);
             } else {
                 throw new NotPermissionException();
@@ -116,8 +138,9 @@ public class AccountServiceImpl implements AccountService {
             throw new AccountIdNotExistedException();
         } else {
             Account account = accountRepository.getById(id);
-            if (!account.isDisabled()) {
+            if (account.isDisabled() == false) {
                 account.setDisabled(true);
+                accountRepository.save(account);
                 return true;
             } else {
                 throw new AccountIdNotExistedException();

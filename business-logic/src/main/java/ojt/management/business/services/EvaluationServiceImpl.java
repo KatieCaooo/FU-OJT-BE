@@ -5,8 +5,10 @@ import ojt.management.common.exceptions.EvaluationIdNotExistedException;
 import ojt.management.common.exceptions.NotPermissionException;
 import ojt.management.common.payload.request.EvaluationCreateRequest;
 import ojt.management.common.payload.request.EvaluationUpdateRequest;
+import ojt.management.data.entities.Application;
 import ojt.management.data.entities.Evaluation;
 import ojt.management.data.repositories.AccountRepository;
+import ojt.management.data.repositories.ApplicationRepository;
 import ojt.management.data.repositories.EvaluationRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,11 +20,13 @@ public class EvaluationServiceImpl implements EvaluationService {
 
     private final EvaluationRepository evaluationRepository;
     private final AccountRepository accountRepository;
+    private final ApplicationRepository applicationRepository;
 
     public EvaluationServiceImpl(EvaluationRepository evaluationRepository,
-                                 AccountRepository accountRepository) {
+                                 AccountRepository accountRepository, ApplicationRepository applicationRepository) {
         this.evaluationRepository = evaluationRepository;
         this.accountRepository = accountRepository;
+        this.applicationRepository = applicationRepository;
     }
 
     @Override
@@ -66,12 +70,16 @@ public class EvaluationServiceImpl implements EvaluationService {
             throws NotPermissionException {
         Evaluation evaluation = new Evaluation();
         Long accountCompanyId = accountRepository.getById(accountId).getRepresentative().getCompany().getId();
-        if (evaluation.getApplication().getJob().getCompany().getId() == accountCompanyId) {
+        Application application = applicationRepository.getById(evaluationCreateRequest.getApplicationId());
+        if (application.getJob().getCompany().getId() == accountCompanyId) {
             evaluation.setGrade(evaluationCreateRequest.getGrade());
             evaluation.setComment(evaluationCreateRequest.getComment());
             evaluation.setPass(evaluationCreateRequest.isPass());
-            evaluation.setApplication(evaluation.getApplication());
-            return evaluationRepository.save(evaluation);
+            evaluation.setApplication(application);
+            evaluation = evaluationRepository.save(evaluation);
+            application.setEvaluation(evaluation);
+            applicationRepository.save(application);
+            return evaluation;
         } else {
             throw new NotPermissionException();
         }

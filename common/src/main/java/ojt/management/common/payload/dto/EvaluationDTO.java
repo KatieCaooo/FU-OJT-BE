@@ -14,5 +14,5 @@ public class EvaluationDTO implements Serializable {
     private String comment;
     private Long grade;
     private boolean isPass;
-    private ApplicationDTO applicationDTO;
+    private ApplicationDTO application;
 }
